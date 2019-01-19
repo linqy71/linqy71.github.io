@@ -78,12 +78,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="nodejs + express + mysql搭建restful风格api">
 <meta property="og:url" content="linqy71.github.io/2019/01/18/express+mysql/index.html">
-<meta property="og:site_name" content="71的博客">
+<meta property="og:site_name" content="每天都要say YES！">
 <meta property="og:description" content="开发前准备 安装node和express 命令行输入express + 项目名初始化项目&amp;gt; express server 进入server文件夹安装依赖&amp;gt; npm install 由于要使用mysql，因此，在package.json中的&amp;quot;dependencies&amp;quot;下添加&amp;quot;mysql&amp;quot;: &amp;quot;latest&amp;quot;，重新执行npm in">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f1b16529b7.png">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f0fa9bf4fd.png">
-<meta property="og:updated_time" content="2019-01-17T18:03:47.196Z">
+<meta property="og:updated_time" content="2019-01-18T12:54:49.195Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nodejs + express + mysql搭建restful风格api">
 <meta name="twitter:description" content="开发前准备 安装node和express 命令行输入express + 项目名初始化项目&amp;gt; express server 进入server文件夹安装依赖&amp;gt; npm install 由于要使用mysql，因此，在package.json中的&amp;quot;dependencies&amp;quot;下添加&amp;quot;mysql&amp;quot;: &amp;quot;latest&amp;quot;，重新执行npm in">
@@ -123,7 +123,7 @@
 
 
 
-  <title>nodejs + express + mysql搭建restful风格api | 71的博客</title>
+  <title>nodejs + express + mysql搭建restful风格api | 每天都要say YES！</title>
   
 
 
@@ -155,12 +155,12 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">71的博客</span>
+        <span class="site-title">每天都要say YES！</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle"></p>
+        <p class="site-subtitle">七七</p>
       
   </div>
 
@@ -271,7 +271,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="71的博客">
+      <meta itemprop="name" content="每天都要say YES！">
     </span>
 
     
@@ -345,7 +345,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  934
+                  970
                 </span>
               
 
@@ -438,6 +438,7 @@
 <p>解决方法：<br> 获取用户信息是通过<code>var user = JSON.stringify(req.body);</code>，然后将这个user传递到userDAO的add方法中，<code>user.name</code>却变成undefine，在add方法中添加<code>user = JSON.parse(user);</code>将参数转化为JSON对象就解决啦。</p>
 </blockquote>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以上，就完成了基本GET和POST方式的api。其余更多需要的处理在于对数据库的设计和操作，依据项目要求而进行调整。</p>
+<p>后来查看文档发现还是有很多地方不符合规范，需要进一步的改进，参考<a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" title="restful api设计指南" target="_blank" rel="noopener">restful api设计指南</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.cnblogs.com/thinkam/p/8299452.html" target="_blank" rel="noopener">https://www.cnblogs.com/thinkam/p/8299452.html</a></p>
 
       
@@ -460,7 +461,7 @@
   <p><span>本文标题:</span><a href="/2019/01/18/express+mysql/">nodejs + express + mysql搭建restful风格api</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 71 的个人博客">71</a></p>
   <p><span>发布时间:</span>2019年01月18日 - 02:01</p>
-  <p><span>最后更新:</span>2019年01月18日 - 02:01</p>
+  <p><span>最后更新:</span>2019年01月18日 - 20:01</p>
   <p><span>原始链接:</span><a href="/2019/01/18/express+mysql/" title="nodejs + express + mysql搭建restful风格api">linqy71.github.io/2019/01/18/express+mysql/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2019/01/18/express+mysql/"  aria-label="复制成功！"></i></span>
   </p>
@@ -486,24 +487,6 @@
 
     
 
-    
-      <div>
-        <ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者：</strong>
-    71
-  </li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    <a href="linqy71.github.io/2019/01/18/express+mysql/" title="nodejs + express + mysql搭建restful风格api">linqy71.github.io/2019/01/18/express+mysql/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>
-    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-
-      </div>
     
 
     <footer class="post-footer">
@@ -776,8 +759,6 @@
   
 
 
-  
-
 
 
 
@@ -816,11 +797,6 @@
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 
@@ -900,6 +876,21 @@
   
 
   
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
 
   
   
