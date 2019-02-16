@@ -83,7 +83,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f1b16529b7.png">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f0fa9bf4fd.png">
-<meta property="og:updated_time" content="2019-01-18T12:54:49.195Z">
+<meta property="og:updated_time" content="2019-02-16T15:40:39.571Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nodejs + express + mysql搭建restful风格api">
 <meta name="twitter:description" content="开发前准备 安装node和express 命令行输入express + 项目名初始化项目&amp;gt; express server 进入server文件夹安装依赖&amp;gt; npm install 由于要使用mysql，因此，在package.json中的&amp;quot;dependencies&amp;quot;下添加&amp;quot;mysql&amp;quot;: &amp;quot;latest&amp;quot;，重新执行npm in">
@@ -345,7 +345,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  970
+                  963
                 </span>
               
 
@@ -389,54 +389,52 @@
 <li>由于要使用mysql，因此，在package.json中的<code>&quot;dependencies&quot;</code>下添加<code>&quot;mysql&quot;: &quot;latest&quot;</code>，重新执行<code>npm install</code></li>
 </ol>
 <h4 id="服务器上安装mysql"><a href="#服务器上安装mysql" class="headerlink" title="服务器上安装mysql"></a>服务器上安装mysql</h4><ol>
-<li>安装mysql<br>CentOS的yum源中没有mysql。没法直接这样 yum -y install<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install mysql.x86_64 mysql-server.x86_64 mysql-devel.x86_64</span><br></pre></td></tr></table></figure>
-</li>
+<li>安装mysql<br>CentOS的yum源中没有mysql。没法直接 yum -y install</li>
 </ol>
 <p><strong>正确方法</strong>：参考<a href="https://blog.csdn.net/a774630093/article/details/79270080" target="_blank" rel="noopener">CentOS7 64位安装mysql教程，亲测完美</a>，包括一些初始配置也在里面。（里面还有开放root供远程连接的方法，保存备用。）</p>
 <h4 id="数据库相关"><a href="#数据库相关" class="headerlink" title="数据库相关"></a>数据库相关</h4><ol>
 <li><p>项目下新建database文件夹，新建DBConfig.js，写入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123;</span><br><span class="line">  mysql : &#123;</span><br><span class="line">    host : &apos;127.0.0.1&apos;,</span><br><span class="line">    user : &apos;root&apos;,</span><br><span class="line">    password : yourPSW,</span><br><span class="line">    database : yourDB,</span><br><span class="line">    port : 3306</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123;</span><br><span class="line">  mysql : &#123;</span><br><span class="line">    host : &apos;127.0.0.1&apos;,</span><br><span class="line">    user : &apos;root&apos;,</span><br><span class="line">    password : yourPSW,</span><br><span class="line">    database : yourDB,</span><br><span class="line">    port : 3306</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>创建数据库和表<br>创建数据库：启动mysql后 <code>create database kuailing</code><br>创建表：采用导入.sql文件的形式。<br><img src="https://i.loli.net/2019/01/16/5c3f1b16529b7.png" alt=""></p>
+<li><p>创建数据库和表<br>  创建数据库：启动mysql后输入 <code>create database kuailing</code><br>  创建表：采用导入.sql文件的形式。<br>  <img src="https://i.loli.net/2019/01/16/5c3f1b16529b7.png" alt=""></p>
 </li>
 <li><p>封装一些数据库操作语句。（我将封装块放在了userDAO中）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var userSqlMap = &#123;</span><br><span class="line">  add: &apos;insert into user(studentid, name, realname, address, password, phone)&apos; +</span><br><span class="line">       &apos; values(?, ?, ?, ?, ?, ?)&apos;,</span><br><span class="line">  deleteById: &apos;delete from user where studentid = ?&apos;,</span><br><span class="line">  update: &apos;update user set name=?, realname=?, address=?, password=?&apos; +</span><br><span class="line">       &apos;, phone=? where studentid=?&apos;,</span><br><span class="line">  list: &apos;select * from user&apos;,</span><br><span class="line">  getById: &apos;select * from user where studentid=?&apos;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var userSqlMap = &#123;</span><br><span class="line">  add: &apos;insert into user(studentid, name, realname, address, password, phone)&apos; +</span><br><span class="line">       &apos; values(?, ?, ?, ?, ?, ?)&apos;,</span><br><span class="line">  deleteById: &apos;delete from user where studentid = ?&apos;,</span><br><span class="line">  update: &apos;update user set name=?, realname=?, address=?, password=?&apos; +</span><br><span class="line">       &apos;, phone=? where studentid=?&apos;,</span><br><span class="line">  list: &apos;select * from user&apos;,</span><br><span class="line">  getById: &apos;select * from user where studentid=?&apos;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>封装返回结果对象。（非必要，因为想要实现api接口无需体现状态）<br>在model文件夹下新建result.js，写入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">exports.createResult = function(success, data) &#123;</span><br><span class="line">  var result = &#123;&#125;;</span><br><span class="line">  result.success = success;</span><br><span class="line">  result.data = data;</span><br><span class="line">  return result;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<li><p>封装返回结果对象。（非必要，因为想要实现api接口无需体现状态）<br>  在model文件夹下新建result.js，返回操作结果success以及需要的数据。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">exports.createResult = function(success, data) &#123;</span><br><span class="line">  var result = &#123;&#125;;</span><br><span class="line">  result.success = success;</span><br><span class="line">  result.data = data;</span><br><span class="line">  return result;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
-</ol>
-<p>将操作结果success以及返回的数据放入result中。</p>
-<ol start="5">
-<li>封装和数据库的交互模块。<br>新建DAO文件夹，新建userDAO.js，写入: <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//建立连接池</span><br><span class="line">var pool = mysql.createPool(DBConfig.mysql);</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  getById: function (studentid, callback) &#123;</span><br><span class="line">    pool.query(userSqlMap.getById, studentid, function (err, result) &#123;</span><br><span class="line">      if (err) throw err;</span><br><span class="line">      console.log(result[0]);</span><br><span class="line">      callback(result[0]);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  //添加新用户</span><br><span class="line">  add: function (user, callback) &#123;</span><br><span class="line">    user = JSON.parse(user);</span><br><span class="line">    pool.query(userSqlMap.add, [user.studentid, user.name, user.realname, user.address,</span><br><span class="line">     user.password, user.phone], function (err, result) &#123;</span><br><span class="line">       if (err) throw err;</span><br><span class="line">       console.log(&apos;result :&apos; + result);</span><br><span class="line">       callback(result.affectedRows &gt; 0);</span><br><span class="line">     &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<li><p>封装和数据库的交互模块。<br>新建DAO文件夹，新建userDAO.js，使用连接池防止频繁获取、释放数据库连接。写入的部分代码如下: </p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">//建立连接池</span><br><span class="line">var pool = mysql.createPool(DBConfig.mysql);</span><br><span class="line">module.exports = &#123;</span><br><span class="line">  getById: function (studentid, callback) &#123;</span><br><span class="line">    pool.query(userSqlMap.getById, studentid, function (err, result) &#123;</span><br><span class="line">      if (err) throw err;</span><br><span class="line">      console.log(result[0]);</span><br><span class="line">      callback(result[0]);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  //添加新用户</span><br><span class="line">  add: function (user, callback) &#123;</span><br><span class="line">    user = JSON.parse(user);</span><br><span class="line">    pool.query(userSqlMap.add, [user.studentid, user.name, user.realname, user.address,</span><br><span class="line">     user.password, user.phone], function (err, result) &#123;</span><br><span class="line">       if (err) throw err;</span><br><span class="line">       console.log(&apos;result :&apos; + result);</span><br><span class="line">       callback(result.affectedRows &gt; 0);</span><br><span class="line">     &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>使用连接池防止频繁获取、释放数据库连接。</p>
 <h4 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h4><ol>
-<li>用户操作路由及实现业务逻辑routes/users.js:<br>GET<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//解析 /users?studentid=xxxx的url</span><br><span class="line">router.get(&apos;&apos;, function(req, res) &#123;</span><br><span class="line">  console.log(req.query);</span><br><span class="line">  userDAO.getById(req.query.studentid, function (user) &#123;</span><br><span class="line">    console.log(user);</span><br><span class="line">    res.json(user);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<li><p>用户操作路由及实现业务逻辑routes/users.js:</p>
+<p> <strong>GET</strong></p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//解析 /users?studentid=xxxx的url</span><br><span class="line">router.get(&apos;&apos;, function(req, res) &#123;</span><br><span class="line">  console.log(req.query);</span><br><span class="line">  userDAO.getById(req.query.studentid, function (user) &#123;</span><br><span class="line">    console.log(user);</span><br><span class="line">    res.json(user);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>POST<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//提交用户信息用于添加新用户</span><br><span class="line">router.post(&apos;/&apos;, function(req, res) &#123;</span><br><span class="line">  var user = JSON.stringify(req.body);</span><br><span class="line">  userDAO.add(user, function(success) &#123;</span><br><span class="line">    var result = &#123;&#125;;</span><br><span class="line">    result.success = success;</span><br><span class="line">    res.json(result);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<blockquote>
-<p>解析 /users/xxxx这种形式的url可以采用以下方式，获取查询参数的方式是req.params。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//解析 /users/xxxx的url，其中xxxx为学号</span><br><span class="line">router.get(&apos;/:studentid&apos;, function (req, res) &#123;</span><br><span class="line">  console.log(&apos;patch users called&apos;);</span><br><span class="line">  userDAO.getById(req.params.studentid, function (user) &#123;</span><br><span class="line">    console.log(user);</span><br><span class="line">    res.json(user);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-</blockquote>
-<h4 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h4><ul>
-<li>启动mysql(<code>mysql -u root -p</code>)后使用数据库mysql(<code>use mysql</code>)输入<code>show variables like &quot;%char%&quot;;</code>想要确定是否为utf8，出现报错：<code>ERROR 1146 (42S02): Table &#39;performance_schema.session_variables&#39; doesn&#39;t exis</code>。</li>
+<pre><code>**POST**
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//提交用户信息用于添加新用户</span><br><span class="line">router.post(&apos;/&apos;, function(req, res) &#123;</span><br><span class="line">  var user = JSON.stringify(req.body);</span><br><span class="line">  userDAO.add(user, function(success) &#123;</span><br><span class="line">    var result = &#123;&#125;;</span><br><span class="line">    result.success = success;</span><br><span class="line">    res.json(result);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+ &gt; 解析 /users/xxxx这种形式的url可以采用以下方式，获取查询参数的方式是req.params。
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//解析 /users/xxxx的url，其中xxxx为学号</span><br><span class="line">router.get(&apos;/:studentid&apos;, function (req, res) &#123;</span><br><span class="line">  console.log(&apos;patch users called&apos;);</span><br><span class="line">  userDAO.getById(req.params.studentid, function (user) &#123;</span><br><span class="line">    console.log(user);</span><br><span class="line">    res.json(user);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</code></pre><h4 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h4><ul>
+<li><p>启动mysql(<code>mysql -u root -p</code>)后使用数据库mysql(<code>use mysql</code>)输入<code>show variables like &quot;%char%&quot;;</code>想要确定是否为utf8，出现报错：ERROR 1146 (42S02): Table ‘performance_schema.session_variables’ doesn’t exis。</p>
+<p>  <em>解决方法</em>：</p>
+<p>  输入：<code>mysql_upgrade -u root -p --force</code>并重启服务。<br>  效果：<br>  <img src="https://i.loli.net/2019/01/16/5c3f0fa9bf4fd.png" alt=""></p>
+</li>
 </ul>
-<blockquote>
-<p>解决方法：<br>输入：<code>mysql_upgrade -u root -p --force</code>并重启服务。<br>效果：<br><img src="https://i.loli.net/2019/01/16/5c3f0fa9bf4fd.png" alt=""></p>
-</blockquote>
-<p><br></p>
 <ul>
 <li>由于以前用的都是mysql workbench，不熟悉命令行操作mysql，因此，命令行操作参考：<br><a href="https://www.cnblogs.com/kpengfang/p/5201285.html" target="_blank" rel="noopener">https://www.cnblogs.com/kpengfang/p/5201285.html</a></li>
 </ul>
-<p><br></p>
 <ul>
-<li>关于采用post实现新增用户一直返回失败的问题。</li>
+<li><p>关于采用post实现新增用户一直返回失败的问题。</p>
+<p>  <em>解决方法</em>：</p>
+<p>   获取用户信息是通过<code>var user = JSON.stringify(req.body);</code>，然后将这个user传递到userDAO的add方法中，<code>user.name</code>却变成undefine，在add方法中添加<code>user = JSON.parse(user);</code>将参数转化为JSON对象就解决啦。</p>
+</li>
 </ul>
-<blockquote>
-<p>解决方法：<br> 获取用户信息是通过<code>var user = JSON.stringify(req.body);</code>，然后将这个user传递到userDAO的add方法中，<code>user.name</code>却变成undefine，在add方法中添加<code>user = JSON.parse(user);</code>将参数转化为JSON对象就解决啦。</p>
-</blockquote>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>以上，就完成了基本GET和POST方式的api。其余更多需要的处理在于对数据库的设计和操作，依据项目要求而进行调整。</p>
 <p>后来查看文档发现还是有很多地方不符合规范，需要进一步的改进，参考<a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" title="restful api设计指南" target="_blank" rel="noopener">restful api设计指南</a></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.cnblogs.com/thinkam/p/8299452.html" target="_blank" rel="noopener">https://www.cnblogs.com/thinkam/p/8299452.html</a></p>
@@ -461,7 +459,7 @@
   <p><span>本文标题:</span><a href="/2019/01/18/express+mysql/">nodejs + express + mysql搭建restful风格api</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 71 的个人博客">71</a></p>
   <p><span>发布时间:</span>2019年01月18日 - 02:01</p>
-  <p><span>最后更新:</span>2019年01月18日 - 20:01</p>
+  <p><span>最后更新:</span>2019年02月16日 - 23:02</p>
   <p><span>原始链接:</span><a href="/2019/01/18/express+mysql/" title="nodejs + express + mysql搭建restful风格api">linqy71.github.io/2019/01/18/express+mysql/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2019/01/18/express+mysql/"  aria-label="复制成功！"></i></span>
   </p>
