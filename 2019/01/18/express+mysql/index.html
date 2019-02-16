@@ -83,7 +83,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f1b16529b7.png">
 <meta property="og:image" content="https://i.loli.net/2019/01/16/5c3f0fa9bf4fd.png">
-<meta property="og:updated_time" content="2019-02-16T15:40:39.571Z">
+<meta property="og:updated_time" content="2019-02-16T16:26:11.553Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nodejs + express + mysql搭建restful风格api">
 <meta name="twitter:description" content="开发前准备 安装node和express 命令行输入express + 项目名初始化项目&amp;gt; express server 进入server文件夹安装依赖&amp;gt; npm install 由于要使用mysql，因此，在package.json中的&amp;quot;dependencies&amp;quot;下添加&amp;quot;mysql&amp;quot;: &amp;quot;latest&amp;quot;，重新执行npm in">
@@ -416,7 +416,9 @@
 </ol>
 <pre><code>**POST**
 
+
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//提交用户信息用于添加新用户</span><br><span class="line">router.post(&apos;/&apos;, function(req, res) &#123;</span><br><span class="line">  var user = JSON.stringify(req.body);</span><br><span class="line">  userDAO.add(user, function(success) &#123;</span><br><span class="line">    var result = &#123;&#125;;</span><br><span class="line">    result.success = success;</span><br><span class="line">    res.json(result);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
 
  &gt; 解析 /users/xxxx这种形式的url可以采用以下方式，获取查询参数的方式是req.params。
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//解析 /users/xxxx的url，其中xxxx为学号</span><br><span class="line">router.get(&apos;/:studentid&apos;, function (req, res) &#123;</span><br><span class="line">  console.log(&apos;patch users called&apos;);</span><br><span class="line">  userDAO.getById(req.params.studentid, function (user) &#123;</span><br><span class="line">    console.log(user);</span><br><span class="line">    res.json(user);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
@@ -459,7 +461,7 @@
   <p><span>本文标题:</span><a href="/2019/01/18/express+mysql/">nodejs + express + mysql搭建restful风格api</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 71 的个人博客">71</a></p>
   <p><span>发布时间:</span>2019年01月18日 - 02:01</p>
-  <p><span>最后更新:</span>2019年02月16日 - 23:02</p>
+  <p><span>最后更新:</span>2019年02月17日 - 00:02</p>
   <p><span>原始链接:</span><a href="/2019/01/18/express+mysql/" title="nodejs + express + mysql搭建restful风格api">linqy71.github.io/2019/01/18/express+mysql/</a>
     <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2019/01/18/express+mysql/"  aria-label="复制成功！"></i></span>
   </p>
