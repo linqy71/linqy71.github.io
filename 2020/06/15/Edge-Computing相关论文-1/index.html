@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="Edge Computing;,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Edge Computing相关论文阅读（一） 主要介绍两篇综述类论文  1. Right-Provisioned IoT Edge Computing: An Overview(Great Lakes Symposium on VLSI 2019 (GLSVLSI’19) ) 作者：Tosiron Adegbija, Roman Lysecky, and Vinu Vijay Kumar Dep">
+<meta name="keywords" content="Edge Computing;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Edge-Computing相关论文-1">
+<meta property="og:url" content="linqy71.github.io/2020/06/15/Edge-Computing相关论文-1/index.html">
+<meta property="og:site_name" content="도깨비 신부">
+<meta property="og:description" content="Edge Computing相关论文阅读（一） 主要介绍两篇综述类论文  1. Right-Provisioned IoT Edge Computing: An Overview(Great Lakes Symposium on VLSI 2019 (GLSVLSI’19) ) 作者：Tosiron Adegbija, Roman Lysecky, and Vinu Vijay Kumar Dep">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="/2020/06/15/Edge-Computing相关论文-1/MEC-framework.png">
+<meta property="og:image" content="/2020/06/15/Edge-Computing相关论文-1/orchestrator%20deployment%20options.png">
+<meta property="og:updated_time" content="2020-06-17T02:06:29.879Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Edge-Computing相关论文-1">
+<meta name="twitter:description" content="Edge Computing相关论文阅读（一） 主要介绍两篇综述类论文  1. Right-Provisioned IoT Edge Computing: An Overview(Great Lakes Symposium on VLSI 2019 (GLSVLSI’19) ) 作者：Tosiron Adegbija, Roman Lysecky, and Vinu Vijay Kumar Dep">
+<meta name="twitter:image" content="/2020/06/15/Edge-Computing相关论文-1/MEC-framework.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2020/06/15/Edge-Computing相关论文-1/">
+
+
+
+
+
+  <title>Edge-Computing相关论文-1 | 도깨비 신부</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">도깨비 신부</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">七七</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/06/15/Edge-Computing相关论文-1/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="71">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="도깨비 신부">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Edge-Computing相关论文-1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-15T15:36:52+08:00">
+                2020-06-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,522
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Edge-Computing相关论文阅读（一）"><a href="#Edge-Computing相关论文阅读（一）" class="headerlink" title="Edge Computing相关论文阅读（一）"></a>Edge Computing相关论文阅读（一）</h1><blockquote>
+<p>主要介绍两篇综述类论文</p>
+</blockquote>
+<h2 id="1-Right-Provisioned-IoT-Edge-Computing-An-Overview"><a href="#1-Right-Provisioned-IoT-Edge-Computing-An-Overview" class="headerlink" title="1. Right-Provisioned IoT Edge Computing: An Overview"></a>1. Right-Provisioned IoT Edge Computing: An Overview</h2><p>(Great Lakes Symposium on VLSI 2019 (GLSVLSI’19) )</p>
+<h3 id="作者："><a href="#作者：" class="headerlink" title="作者："></a>作者：</h3><p>Tosiron Adegbija, Roman Lysecky, and Vinu Vijay Kumar</p>
+<p>Department of Electrical &amp; Computer Engineering, University of Arizona, Tucson, AZ, USA;<br>Google, Mountain View, CA</p>
+<h3 id="摘要："><a href="#摘要：" class="headerlink" title="摘要："></a>摘要：</h3><p>物联网（IoT）上的边缘计算是一种越来越流行的范例，其中计算越来越靠近数据源（即边缘设备）。 边缘计算可减轻因响应时间，通信带宽，数据安全性和隐私，能源消耗等增加而导致的基于云计算的开销。但是，鉴于新兴物联网设备的潜在严格资源限制和功能要求，边缘计算绝不能<strong>被过度或不足地配置</strong>。 在本文中，我们概述了正确配置的IoT边缘计算问题，其中IoT设备配备了“足够”资源，即使在设计时可能没有明确定义“足够”时也是如此。 我们<strong>重点介绍了一些研究方向和关键挑战，以实现正确配置的物联网边缘计算</strong>。</p>
+<h3 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h3><ol>
+<li>本文所描述的边缘计算是指在边缘设备上进行计算，区别于MEC（在基站或路由器上进行计算）</li>
+<li>正确配置(right-provisioned)是指：既不使得设备性能降低又能合理利用设备资源</li>
+<li><p>正确配置应该是针对系统的，而不是针对应用的，因此获知系统的行为信息十分重要。而大多数物联网设备涉及一些可变性，在运行期间，应用程序、系统输入、目标功能或用户要求可能会发生巨大变化。</p>
+</li>
+<li><p>定义：</p>
+</li>
+</ol>
+<ul>
+<li>under-provisioned: 影响了功能/性能</li>
+<li>over-provisioned: 资源过剩</li>
+</ul>
+<ol start="5">
+<li>粒度：</li>
+</ol>
+<ul>
+<li>task specific → application specific → domain specific → general<br>(domain-specific: 提供更好的应用程序灵活性，并且对于执行各种相似应用程序的系统而言更好。)</li>
+</ul>
+<ol start="6">
+<li>static VS dynamic</li>
+</ol>
+<ul>
+<li><p>大多数IoT设备是静态配置的，需要提前获知整个系统的信息。静态配置适用于只执行单个应用程序或一些已知其先验特征的应用程序。</p>
+</li>
+<li><p>动态配置能够满足系统在运行过程中发生变化的要求</p>
+</li>
+</ul>
+<ol start="7">
+<li>挑战</li>
+</ol>
+<ul>
+<li><p>HLS(hign-level synthesis)</p>
+<ul>
+<li>timing-driven low-power right-provisioned：<br>为系统的各个组件选择合适的时钟域和频率，以使组合延迟小于总延迟约束，同时满足功率约束</li>
+<li>新兴的HLS方法必须提供形式化设计，合成和优化框架，以支持可精确合成的可精确计时系统模型，从而使各种不同的计算方式具有明确的综合规范</li>
+<li>这些新的HLS方法必须能够自动提取与现有的性能驱动的HLS工具/方法无缝集成所需的组件级和系统级综合约束。</li>
+<li>新的HLS方法必须支持设计方法，事件驱动的通信以及在给定系统需求和约束的情况下进行自我时钟优化以优化能耗。</li>
+</ul>
+</li>
+<li><p>计算卸载</p>
+<ul>
+<li>为了满足功能需求和系统约束，需要动态计算迁移方案来自适应地确定必须执行的计算。（协调计算开销与卸载开销）</li>
+</ul>
+</li>
+<li><p>threat detection</p>
+</li>
+<li>Energy efficiency </li>
+<li>adaptive memories</li>
+</ul>
+<h2 id="2-Cost-Aware-Cloudlet-Placement-in-Edge-Computing-Systems"><a href="#2-Cost-Aware-Cloudlet-Placement-in-Edge-Computing-Systems" class="headerlink" title="2. Cost-Aware Cloudlet Placement in Edge Computing Systems"></a>2. Cost-Aware Cloudlet Placement in Edge Computing Systems</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>边缘计算中的一项众所周知的挑战是战略性放置小云。 这项挑战的基本目标是最大程度地<strong>降低部署成本，并确保边缘服务用户的延迟最小</strong>。 我们通过设计一种可感知成本的Cloudlet放置方法来解决此挑战，该方法可将<strong>用户应用程序完全映射到适当的Cloudlet，同时确保其延迟要求</strong>。 我们通过基于纽约市OpenData进行广泛的实验来研究我们提出的方法的有效性。 结果表明，我们的方法获得了接近最佳成本的解决方案，并且大大减少了执行时间。</p>
+<h2 id="3-On-Multi-Access-Edge-Computing-A-Survey-of-the-Emerging-5G-Network-Edge-Cloud-Architecture-and-Orchestration"><a href="#3-On-Multi-Access-Edge-Computing-A-Survey-of-the-Emerging-5G-Network-Edge-Cloud-Architecture-and-Orchestration" class="headerlink" title="3. On Multi-Access Edge Computing: A Survey of the Emerging 5G Network Edge Cloud Architecture and Orchestration"></a>3. On Multi-Access Edge Computing: A Survey of the Emerging 5G Network Edge Cloud Architecture and Orchestration</h2><p>（IEEE Communications Surveys &amp; Tutorials）</p>
+<h3 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h3><p>多访问边缘计算（MEC）是一个新兴的生态系统，旨在融合电信和IT服务，在无线电访问网络的边缘提供一个云计算平台。 MEC在边缘提供存储和计算资源，从而减少了移动最终用户的等待时间，并更有效地利用了移动回程和核心网络。 本文介绍了有关MEC的调查，重点介绍了<strong>基本的关键支持技术</strong>。 它在考虑单个服务和支持移动性的MEC平台网络的情况下精心设计了MEC编排，从而为不同的编排部署选项带来了光明。 此外，本文<strong>分析了MEC参考体系结构和主要部署方案</strong>，这些方案为应用程序开发人员，内容提供商和第三方提供了多租户支持。 最后，本文概述了当前的标准化活动，并进一步阐述了开放研究的挑战。</p>
+<h3 id="内容-1"><a href="#内容-1" class="headerlink" title="内容"></a>内容</h3><h4 id="MEC-usecases-and-applications"><a href="#MEC-usecases-and-applications" class="headerlink" title="MEC usecases and applications"></a>MEC usecases and applications</h4><ol>
+<li>计算卸载<ul>
+<li>energy consumption</li>
+<li>code partitioning</li>
+<li>RAN awareness ( Gaining information on the RAN quality and user context before performing ofﬂoading can assist both the device and the network to make the best out of the MEC platform services )</li>
+</ul>
+</li>
+<li>分布式内容交付与缓存<ul>
+<li>context awareness</li>
+<li>pre-caching</li>
+<li>popularity prediction</li>
+</ul>
+</li>
+<li>web性能增强<ul>
+<li>content optimization (content awareness)</li>
+<li>accelerated browsing</li>
+<li>web acceleration: adapting the content size dynamically</li>
+</ul>
+</li>
+<li>IoT和大数据<ul>
+<li>data aggregation and big data analytics</li>
+</ul>
+</li>
+<li>智能城市服务</li>
+<li>应用感知与内容优化 </li>
+</ol>
+<h4 id="MEC-enabling-technologies"><a href="#MEC-enabling-technologies" class="headerlink" title="MEC enabling technologies"></a>MEC enabling technologies</h4><ol>
+<li><p>cloud computing</p>
+<ul>
+<li>私有云、公有云等技术模型</li>
+<li>Iaas、Paas、SaaS等服务模型</li>
+</ul>
+</li>
+<li><p>VMs and Containers</p>
+</li>
+<li>NFV</li>
+<li><p>SDN<br> By decoupling the control plane from the data plane and through the use of common APIs, SDN introduces a logical centralized control, which can easily instantiate and offer virtual network instances, by abstracting the underlying network infrastructure.</p>
+</li>
+<li><p>Network Slicing<br>It consists in slicing one network into multiple instances, each architected and optimized for a speciﬁc requirement and/or speciﬁc application/service</p>
+</li>
+</ol>
+<h4 id="MEC-FrameWork-and-architecture"><a href="#MEC-FrameWork-and-architecture" class="headerlink" title="MEC FrameWork and architecture"></a>MEC FrameWork and architecture</h4><p><img src="/2020/06/15/Edge-Computing相关论文-1/MEC-framework.png" alt=""></p>
+<h4 id="MEC-service-and-orchestration"><a href="#MEC-service-and-orchestration" class="headerlink" title="MEC service and orchestration"></a>MEC service and orchestration</h4><p>orchestration 包含这些属性：</p>
+<ol>
+<li>Resource allocation</li>
+<li>Service placement</li>
+<li>Edge selection</li>
+<li>Reliability</li>
+<li>Service mobility<ul>
+<li>VM migration</li>
+</ul>
+</li>
+<li>Joint optimization of VNFs and MEC services</li>
+</ol>
+<h4 id="MEC-deployment-issues-in-mobile-networks"><a href="#MEC-deployment-issues-in-mobile-networks" class="headerlink" title="MEC deployment issues in mobile networks"></a>MEC deployment issues in mobile networks</h4><ul>
+<li><p>Orchestration Deployment Options </p>
+<p><img src="/2020/06/15/Edge-Computing相关论文-1/orchestrator%20deployment%20options.png" alt=""></p>
+<ul>
+<li><p>Open-O: 由Linux Foundation支持的一个开源项目，该项目建立了运营商级的编排平台，以跨虚拟的SDN / NFV基础架构和旧版网络提供端到端的组合服务。 OPEN-O实现了灵活性，支持多域和多位置，并通过自动化提高了服务生命周期。它还通过三个业务流程模块的层次结构缩短了上市时间，从而加快了创新速度。这种编排层次结构由（i）启用端到端服务组合和交付的Global Service Orchestrator，（ii）负责NFV编排的NFV-O组成，其中考虑了范围广泛的VNFM和VIM中的各种VNF，以及（iii ）SDNOrchestrator，它通过不同的SDN控制器（例如OpenDaylight和ONOS）和/或传统的元素管理系统来提供网络连接和流量控制。 Open-O采用TOSCA，YANG数据模型，REST API，OpenStack，并通过各种SDN，NFV和旧版网络支持资源抽象，从而提供包括策略管理，安全性和其他管理功能在内的一组通用服务.</p>
+</li>
+<li><p>ECOMP: 该项目最初由AT＆T发起，后来移交给Linux Foundation。它专注于VNF管理和提供以软件为中心的网络功能，并利用云技术和网络虚拟化的优势提供自动化服务。 ECOMP定义了一个负责自动化端到端服务实例的主服务协调器，它与三种不同的Controller类型（即通常在云层内的基础结构控制器，网络控制器和应用程序控制器）进行交互。编排自动化配置过程，可编程性规则和由策略驱动的操作管理，考虑到网络数据和面向服务的分析，在实例化，修改和终止网络，应用程序或基础架构服务和资源方面实现了灵活性。 ECOMP扩展了ETSI MANO的范围，引入了资源控制器和策略组件的概念以及资源描述的概念，即元数据，用于虚拟环境的生命周期管理，从而实现了网络的敏捷性和弹性，同时缩短了时间，市场。为此，ECOMP支持开放云标准（例如OpenStack，OPNFV和TOSCA），并遵循Netconf，Yang配置和管理模型以及REST-API。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Open Network Automation Platform (ONAP) : Open-O与ECOMP合并。</li>
+</ul>
+<blockquote>
+<p>《边缘计算开源平台现状分析》<br>面向物联网端：EdgeXfoundry、ApacheEdgent<br>面向边缘云：CORD、Akraino EdgeStack<br>面向云边融合：Azure IoT Edge<br>面向构建边缘计算平台：</p>
+<ul>
+<li>网络管理：ONAP</li>
+<li>容器技术：Docker</li>
+<li>云平台： OpenStack</li>
+<li>人工智能技术：Acumos</li>
+</ul>
+</blockquote>
+<h4 id="Lessions-learned-and-research-challenges"><a href="#Lessions-learned-and-research-challenges" class="headerlink" title="Lessions learned and research challenges"></a>Lessions learned and research challenges</h4><ul>
+<li>MEC Service Orchestration and Programmability </li>
+<li>MEC Service Continuity and Mobility</li>
+<li>Service enhancements: QoE and Resiliency</li>
+<li>MEC Security and Privacy </li>
+<li>MEC Service Monetization </li>
+</ul>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>MEC是一项新兴技术，它通过网络提出了边缘云计算的技术优势，并支持多租户，允许第三方通过标准化API按需提供应用程序和服务。 MEC使无线电和网络层对应用程序提供商/开发人员可见，从而在QoE上提供了一系列新的进步。 MEC被认为是5G系统的关键新兴技术之一，这归功于它对回程和核心网络中的低延迟保证和容量增强的显着贡献。 MEC的成功从根本上取决于技术与ETSI NFV ISG的一致性，以在服务弹性和生命周期管理，服务移动性以及与网络资源的联合优化方面正确定义管理和协调系统。目前，MEC提出了一系列尚未解决的挑战。但是，考虑到其潜力，很明显，MEC将极大地提升移动通信的形态和体验。</p>
+<h5 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h5><p>进一步了解相关开源项目研究内容，结合所了解的边缘计算方向挑战，寻找可入手的点。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Edge-Computing/" rel="tag"><i class="fa fa-tag"></i> Edge Computing;</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/08/service-placement相关文章/" rel="next" title="service-placement相关文章">
+                <i class="fa fa-chevron-left"></i> service-placement相关文章
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="71">
+            
+              <p class="site-author-name" itemprop="name">71</p>
+              <p class="site-description motion-element" itemprop="description">嘻嘻嘻</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Edge-Computing相关论文阅读（一）"><span class="nav-number">1.</span> <span class="nav-text">Edge Computing相关论文阅读（一）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Right-Provisioned-IoT-Edge-Computing-An-Overview"><span class="nav-number">1.1.</span> <span class="nav-text">1. Right-Provisioned IoT Edge Computing: An Overview</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#作者："><span class="nav-number">1.1.1.</span> <span class="nav-text">作者：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要："><span class="nav-number">1.1.2.</span> <span class="nav-text">摘要：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内容"><span class="nav-number">1.1.3.</span> <span class="nav-text">内容</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Cost-Aware-Cloudlet-Placement-in-Edge-Computing-Systems"><span class="nav-number">1.2.</span> <span class="nav-text">2. Cost-Aware Cloudlet Placement in Edge Computing Systems</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要"><span class="nav-number">1.2.1.</span> <span class="nav-text">摘要</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-On-Multi-Access-Edge-Computing-A-Survey-of-the-Emerging-5G-Network-Edge-Cloud-Architecture-and-Orchestration"><span class="nav-number">1.3.</span> <span class="nav-text">3. On Multi-Access Edge Computing: A Survey of the Emerging 5G Network Edge Cloud Architecture and Orchestration</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内容-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MEC-usecases-and-applications"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">MEC usecases and applications</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEC-enabling-technologies"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">MEC enabling technologies</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEC-FrameWork-and-architecture"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">MEC FrameWork and architecture</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEC-service-and-orchestration"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">MEC service and orchestration</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEC-deployment-issues-in-mobile-networks"><span class="nav-number">1.3.2.5.</span> <span class="nav-text">MEC deployment issues in mobile networks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Lessions-learned-and-research-challenges"><span class="nav-number">1.3.2.6.</span> <span class="nav-text">Lessions learned and research challenges</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">1.3.3.</span> <span class="nav-text">结论</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#下一步"><span class="nav-number">1.3.3.0.1.</span> <span class="nav-text">下一步</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">71</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
