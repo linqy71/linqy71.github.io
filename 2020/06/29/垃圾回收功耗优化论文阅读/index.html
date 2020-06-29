@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="垃圾回收；功耗优化,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="垃圾回收功耗优化论文阅读1. Heap Compression for Memory-Constrained Java EnvironmentsMS: Mark-SweepMC: Mark-CompactMCC: Mark-Compact-CompressMCL: Mark-Compact-LazyMCCL: Mark-Compact-Compress-Lazy MS: “fregment pro">
+<meta name="keywords" content="垃圾回收；功耗优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="垃圾回收功耗优化论文阅读">
+<meta property="og:url" content="linqy71.github.io/2020/06/29/垃圾回收功耗优化论文阅读/index.html">
+<meta property="og:site_name" content="도깨비 신부">
+<meta property="og:description" content="垃圾回收功耗优化论文阅读1. Heap Compression for Memory-Constrained Java EnvironmentsMS: Mark-SweepMC: Mark-CompactMCC: Mark-Compact-CompressMCL: Mark-Compact-LazyMCCL: Mark-Compact-Compress-Lazy MS: “fregment pro">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig13_in_paper1.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig2_in_paper2.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig5_in_paper2.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig9_in_paper2.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig10_in_paper2.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig14_in_paper2.png">
+<meta property="og:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig8_in_paper3.png">
+<meta property="og:updated_time" content="2020-06-29T14:03:28.522Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="垃圾回收功耗优化论文阅读">
+<meta name="twitter:description" content="垃圾回收功耗优化论文阅读1. Heap Compression for Memory-Constrained Java EnvironmentsMS: Mark-SweepMC: Mark-CompactMCC: Mark-Compact-CompressMCL: Mark-Compact-LazyMCCL: Mark-Compact-Compress-Lazy MS: “fregment pro">
+<meta name="twitter:image" content="/2020/06/29/垃圾回收功耗优化论文阅读/Fig13_in_paper1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2020/06/29/垃圾回收功耗优化论文阅读/">
+
+
+
+
+
+  <title>垃圾回收功耗优化论文阅读 | 도깨비 신부</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">도깨비 신부</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">七七</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/06/29/垃圾回收功耗优化论文阅读/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="71">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="도깨비 신부">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">垃圾回收功耗优化论文阅读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-29T22:01:27+08:00">
+                2020-06-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,329
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="垃圾回收功耗优化论文阅读"><a href="#垃圾回收功耗优化论文阅读" class="headerlink" title="垃圾回收功耗优化论文阅读"></a>垃圾回收功耗优化论文阅读</h1><h2 id="1-Heap-Compression-for-Memory-Constrained-Java-Environments"><a href="#1-Heap-Compression-for-Memory-Constrained-Java-Environments" class="headerlink" title="1. Heap Compression for Memory-Constrained Java Environments"></a>1. Heap Compression for Memory-Constrained Java Environments</h2><p>MS: Mark-Sweep<br>MC: Mark-Compact<br>MCC: Mark-Compact-Compress<br>MCL: Mark-Compact-Lazy<br>MCCL: Mark-Compact-Compress-Lazy</p>
+<p>MS: “fregment problem”,即垃圾释放后空间碎片化问题</p>
+<p>MC: </p>
+<ul>
+<li>Mark结束后，将存活对象整理到堆的一侧，另一侧释放后作为完整的空闲区域。</li>
+<li>解决上述MS的问题。</li>
+<li>缺点：移动了对象，所以对对象的引用(reference)也需要更新。</li>
+</ul>
+<p>MCC:</p>
+<ul>
+<li>标记存活对象并记录大小，由此得出剩余空间大小</li>
+<li>当剩余空间小于请求分配的空间时，压缩存活对象以增加可用空间。</li>
+<li>缺点：压缩和解压带来额外开销</li>
+</ul>
+<p>MCL：</p>
+<ul>
+<li>当一个对象被创建后，实际上用到的可能只有一小部分。</li>
+<li>将大对象分解成几个子对象，当子对象遇到第一次写访问的时候才真正被allocated</li>
+</ul>
+<p>MCCL：</p>
+<ul>
+<li>MCC和MCL的结合，效果最优。</li>
+</ul>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><ol>
+<li><p>indirect object reference</p>
+<ul>
+<li>在handle pool中创建handle， 每个handle由指向instance的指针和指向class的指针构成。</li>
+<li>当handle pool空间用尽时，GC被触发。</li>
+<li>当handle pool的剩余空间小于某个阈值时，它会扩大。</li>
+</ul>
+</li>
+<li><p>压缩</p>
+</li>
+<li>解压缩</li>
+<li>将大对象分解</li>
+<li>Lazy Allocation. 分解后的子对象直到第一次写访问时才被真正创建。</li>
+</ol>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><ul>
+<li>主要对比的是运行过程中堆的使用情况。</li>
+<li>MCCL各阶段所花的时间与MC所花时间的对比结果：<br><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig13_in_paper1.png" alt=""></li>
+</ul>
+<h3 id="激进的对象压缩"><a href="#激进的对象压缩" class="headerlink" title="激进的对象压缩"></a>激进的对象压缩</h3><ul>
+<li>原本，只有当compaction不足以提供足够的空闲空间用于分配时，compression才会被触发。</li>
+<li>从实验结果看，对于heap memory较小的情况来说，激进的对象压缩能够一定程度减少MCCL原本所花的时间。</li>
+</ul>
+<h3 id="去掉handle-pool"><a href="#去掉handle-pool" class="headerlink" title="去掉handle pool"></a>去掉handle pool</h3><p>由于handle pool的大小很难确定，所以去掉它会更合适。由此带来的代价是压缩率轻微下降。</p>
+<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h3><p>与能耗、GC相关的：</p>
+<p>Chen et al. [14]，提出能够降低嵌入式Java应用程序能耗的方法。证明了提高GC的频率有助于增加可以放入低功耗操作模式的bank的数量。<br>[14] G. Chen, R. Shetty, M. Kandemir, N. Vijaykrishnan, M. J. Irwin, and M. Wolczko. Tuning garbage collection in an embedded Java environment. In the 8th International Symposium on High-Performance Computer Architecture (HPCA’02), Cambridge, MA, USA, Feb. 2002. </p>
+<p>逃逸分析（例如[16]）提供了另一种解决方案，可以减少垃圾收集的负担。具体来说，逃逸分析器确定对象是否可以在堆栈中分配，以及对象是否仅由单个线程访问。这样，当相应的方法返回时，堆中分配的对象可以自动收集，并且可以安全地删除仅由单个线程访问的对象上的同步。Choi等人。[16] 显示出，对于他们的基准测试，多达70%的对象可以在堆栈中分配，11%到92%的锁操作可以安全删除。综上所述，他们观察到了从2%到23%的性能改进。</p>
+<hr>
+<p>思路：模仿此文压缩算法，把所有对象压缩以后程序继续执行，经过多次gc后仍保持压缩的对象则放入低功耗内存中。（得先试一下每种负载中到底有多少冷对象）</p>
+<h2 id="2-Tuning-garbage-collection-in-an-embedded-Java-environment"><a href="#2-Tuning-garbage-collection-in-an-embedded-Java-environment" class="headerlink" title="2. Tuning garbage collection in an embedded Java environment"></a>2. Tuning garbage collection in an embedded Java environment</h2><p>主要思路：<br>shuts off memory banks that do not hold live data.</p>
+<p>个人疑问：</p>
+<ul>
+<li>模拟器如何实现shut off？<ul>
+<li>读后感想：难道是把voltage设为0？</li>
+</ul>
+</li>
+</ul>
+<p>memory energy主要包括 dynamic energy 和 leakage energy</p>
+<ul>
+<li>when a memory array is referenced or precharged, 动态功耗就会产生。</li>
+<li>本文主要解决的是leakage energy。方法：integrated hardware-software strategy.</li>
+</ul>
+<h3 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h3><p><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig2_in_paper2.png" alt=""></p>
+<p>（疑问：模拟器能够区分RAM和ROM吗？）</p>
+<ol>
+<li>ROM一旦被激活就不会再关掉，因此它只有在首次引用时才会被激活，从而减少程序执行过程中没有用到的memory banks的leakage energy。</li>
+<li>将SRAM划分为banks，根据是否装有存活对象决定是否断电。</li>
+<li>datapath energy = execution energy + gc energy</li>
+<li>gc energy = mark energy + sweep energy + compact energy(if used)</li>
+<li>memory energy = heap + runtime stack + KVM &amp; class lib(see fig.2)</li>
+<li>对SRAM采用的功耗模型与用于cache的模型类似。每个bank的大小以及bank的数量是可调的。</li>
+<li>每个bank有三种状态：read/write, active（有存活对象但没有读写操作）, inactive（没有存活对象）</li>
+<li>read/write 和 active 状态产生动态功耗，inactive状态产生少量静态功耗</li>
+</ol>
+<h3 id="能耗特点及优化"><a href="#能耗特点及优化" class="headerlink" title="能耗特点及优化"></a>能耗特点及优化</h3><p><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig5_in_paper2.png" alt=""></p>
+<p>A.断电法：</p>
+<ol>
+<li>75.6%的heap energy来自leakage</li>
+<li>将无用bank断电后，heap energy减少了31%， 90%是因为leakage的减少。</li>
+<li>访问断电的bank会带来额外的开销。</li>
+</ol>
+<p>提前gc法：</p>
+<ol>
+<li>当对象变成垃圾后，在它被回收之前还是会持续产生能耗，因此提高gc的频率可以适当减低能耗，当然需要与gc本身的能耗做平衡。</li>
+<li>提高gc频率的策略：k-allocation<ul>
+<li>每经过k次allocation后就调用一次gc</li>
+<li><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig9_in_paper2.png" alt=""></li>
+</ul>
+</li>
+</ol>
+<p>B.调整位置法：</p>
+<ol>
+<li>原本对象分配空间不考虑位置，即整个heap使用一个free list。现令每个bank单独维护一个free list，尽量将对象分配在active bank上。即active-bank-first allocation。</li>
+<li>Active Bank+：结合了active-bank-first allocation以及当现有的active bank无法满足分配要求时触发gc的策略。</li>
+</ol>
+<p>以上，Active Bank+最佳。对比结果：<br><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig10_in_paper2.png" alt=""></p>
+<p>C.Compact 策略：</p>
+<ol>
+<li>原本，heap将permanent object放在一个特定区域，现指定几个特定的bank作为这个特定的区域来存放permanent objects。</li>
+<li>好处：当新的permanent object创建时无需移动dynamic object。</li>
+<li>缺点：当permanent和dynamic对象都存在时需要同时激活至少2个bank。</li>
+<li>结果：Active Bank+结合compact策略效果最优。</li>
+</ol>
+<p>D.还有一个M&amp;C2：<br>采用Lisp2算法代替KVM中原本的break table-based算法。（break table是更新reference时要用到的）<br>好处：能够处理不同大小的对象，并维持了对象被创建后的顺序，<br>坏处：在每个对象的header中需要添加一个4 byte的指针域。</p>
+<p>MC2的好处：</p>
+<ul>
+<li>可以根据对象的生命周期移动对象。例如：生命周期相近的对象放到同一个bank中。</li>
+<li>更新reference更高效。</li>
+</ul>
+<p>E.调整Heap大小以及bank数量：<br><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig14_in_paper2.png" alt=""></p>
+<h3 id="相关工作-1"><a href="#相关工作-1" class="headerlink" title="相关工作"></a>相关工作</h3><ol>
+<li>Catthoor et al. [1998], Kandemir et al. [2000], and Vijaykrishnan et al. [2000] ：程序转换可以非常有效地降低以数组为主导的嵌入式应用程序的内存能量</li>
+<li>Lebeck et al. and Delaluzetal 提出了基于操作系统和基于编译器/硬件的优化策略，以降低动态功耗</li>
+</ol>
+<hr>
+<h2 id="3-Impact-of-GC-Design-on-Power-and-Performance-for-Android"><a href="#3-Impact-of-GC-Design-on-Power-and-Performance-for-Android" class="headerlink" title="3. Impact of GC Design on Power and Performance for Android"></a>3. Impact of GC Design on Power and Performance for Android</h2><p>主要思路：<br>采用不同的GC策略，观察其对android设备的能耗和性能影响。</p>
+<h3 id="CMS"><a href="#CMS" class="headerlink" title="CMS"></a>CMS</h3><p>CMS: Dalvik Concurrent Mark-Sweep（安卓内部gc）</p>
+<ol>
+<li><p>Dalvik GC通常作为C编码的后台守护进程，在自己的本地Linux线程中并发运行，应用程序级Java变异器线程（mutator）也被调度为本地Linux线程</p>
+<ul>
+<li>Dalvik的组成部分包括：GC deamon, JIT compiler, signal catcher, main thread, application threads</li>
+<li>mutator thread: 即application thread</li>
+</ul>
+</li>
+<li><p>CMS在每个collection cycle开始时将所有mutator threads 挂起，扫描heap roots, 然后在mark开始之前恢复被挂起的线程，随后并发进行mark。</p>
+</li>
+<li>当并发的mark阶段结束后，再次将mutator threads挂起，mark剩下的对象…然后恢复挂起的线程，再进行sweep。</li>
+</ol>
+<ul>
+<li>targetUtil: 每次GC结束后用来调整heap大小的值</li>
+<li>softLimit: 某个阈值</li>
+<li>CSB 阈值：softLimit - 某个delta</li>
+</ul>
+<ol start="4">
+<li>CMS 被触发的条件：</li>
+</ol>
+<ul>
+<li>allocation 超过CSB阈值，触发background GC</li>
+<li>allocation 超过softLimit 或 allocation失败， 触发 foreground GC</li>
+<li>显式GC，当 System.gc() 被调用时。</li>
+</ul>
+<h3 id="Generational-CMS"><a href="#Generational-CMS" class="headerlink" title="Generational CMS"></a>Generational CMS</h3><ol>
+<li>generational 即，假定 最近创建的对象有较低的存活概率，将堆分为young和mature两个部分。</li>
+<li>Minor GC 将young区域中存活的对象放到mature区域中。</li>
+<li>major GC则检测整个区域，包括young 和 mature</li>
+<li>Gen CMS 即 在 CMS的基础上，将新分配的对象当作young，将GC后存活的对象当作old。</li>
+<li>Gen CMS 与 CMS 触发GC的条件相同，只不过被触发的变成了minor GC，而major GC 只有当存活的对象已经超过了softLimit才会被触发。</li>
+</ol>
+<h3 id="CMSFly"><a href="#CMSFly" class="headerlink" title="CMSFly"></a>CMSFly</h3><ol>
+<li>当CMS进行 mark 操作时，有个stop-the-world阶段，CMSFly则解决这个问题。</li>
+<li>当一个mutator thread的root已经被mark之后，CMSFly则立即通知它继续执行(本来是标记完一轮之后才继续执行)。</li>
+</ol>
+<h3 id="Concurrency-Policies"><a href="#Concurrency-Policies" class="headerlink" title="Concurrency Policies"></a>Concurrency Policies</h3><ol>
+<li>background: 由GC deamon完成</li>
+<li>foreground: 由mutator完成，与其他线程并行。</li>
+</ol>
+<h3 id="实验结果-1"><a href="#实验结果-1" class="headerlink" title="实验结果"></a>实验结果</h3><ol>
+<li>增加堆大小并不一定能减少能耗</li>
+<li>当GC全部是由GC deamon在后台完成时，能耗增加了。</li>
+<li>调整heap 增长策略或并发性能减少能耗。</li>
+<li><p>foreground GC 改善minimum mutator utilization（与响应度相关的指标）。而background和generational策略则更适用于large heap。</p>
+</li>
+<li><p>不同的GC策略在不同benchmark上的能耗表现如下：(没有绝对更优，取决于benchmark以及系统配置)<br><img src="/2020/06/29/垃圾回收功耗优化论文阅读/Fig8_in_paper3.png" alt=""></p>
+</li>
+</ol>
+<h3 id="相关工作-2"><a href="#相关工作-2" class="headerlink" title="相关工作"></a>相关工作</h3><ol>
+<li>结合Mark-Sweep Compact和引用计数(An energy efficient garbage collector for Java embeded devices)</li>
+<li>Tuning garbage collection in an embedded Java environment，即文章2</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/垃圾回收；功耗优化/" rel="tag"><i class="fa fa-tag"></i> 垃圾回收；功耗优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/15/Edge-Computing相关论文-1/" rel="next" title="Edge-Computing相关论文-1">
+                <i class="fa fa-chevron-left"></i> Edge-Computing相关论文-1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="71">
+            
+              <p class="site-author-name" itemprop="name">71</p>
+              <p class="site-description motion-element" itemprop="description">嘻嘻嘻</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#垃圾回收功耗优化论文阅读"><span class="nav-number">1.</span> <span class="nav-text">垃圾回收功耗优化论文阅读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Heap-Compression-for-Memory-Constrained-Java-Environments"><span class="nav-number">1.1.</span> <span class="nav-text">1. Heap Compression for Memory-Constrained Java Environments</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">1.1.1.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">1.1.2.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#激进的对象压缩"><span class="nav-number">1.1.3.</span> <span class="nav-text">激进的对象压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#去掉handle-pool"><span class="nav-number">1.1.4.</span> <span class="nav-text">去掉handle pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关工作"><span class="nav-number">1.1.5.</span> <span class="nav-text">相关工作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Tuning-garbage-collection-in-an-embedded-Java-environment"><span class="nav-number">1.2.</span> <span class="nav-text">2. Tuning garbage collection in an embedded Java environment</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#能耗特点及优化"><span class="nav-number">1.2.2.</span> <span class="nav-text">能耗特点及优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关工作-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">相关工作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Impact-of-GC-Design-on-Power-and-Performance-for-Android"><span class="nav-number">1.3.</span> <span class="nav-text">3. Impact of GC Design on Power and Performance for Android</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CMS"><span class="nav-number">1.3.1.</span> <span class="nav-text">CMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generational-CMS"><span class="nav-number">1.3.2.</span> <span class="nav-text">Generational CMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMSFly"><span class="nav-number">1.3.3.</span> <span class="nav-text">CMSFly</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Concurrency-Policies"><span class="nav-number">1.3.4.</span> <span class="nav-text">Concurrency Policies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果-1"><span class="nav-number">1.3.5.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关工作-2"><span class="nav-number">1.3.6.</span> <span class="nav-text">相关工作</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">71</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
