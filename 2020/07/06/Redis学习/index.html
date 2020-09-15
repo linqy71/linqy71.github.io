@@ -81,7 +81,7 @@
 <meta property="og:site_name" content="도깨비 신부">
 <meta property="og:description" content="了解RedisRedis介绍REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。 Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。 它通常被称为数据结构服务器，因为值（value）可以是 字符串(Str">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-07-08T03:01:07.870Z">
+<meta property="og:updated_time" content="2020-09-07T08:36:11.761Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis学习">
 <meta name="twitter:description" content="了解RedisRedis介绍REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。 Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。 它通常被称为数据结构服务器，因为值（value）可以是 字符串(Str">
@@ -342,7 +342,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  209
+                  1,427
                 </span>
               
 
@@ -358,7 +358,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  5
                 </span>
               
             </div>
@@ -386,6 +386,117 @@
 <li>Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。</li>
 <li>Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。</li>
 <li>Redis支持数据的备份，即master-slave模式的数据备份。</li>
+</ul>
+<h2 id="Redis支持的数据结构"><a href="#Redis支持的数据结构" class="headerlink" title="Redis支持的数据结构"></a>Redis支持的数据结构</h2><ul>
+<li>简单动态字符串 （simple dynamic string SDS）<ul>
+<li>空间预分配：若SDS长度大于1MB，程序会分配1MB的未使用空间。</li>
+<li>惰性空间释放</li>
+<li>二进制安全</li>
+<li>获取字符串长度为常数复杂度</li>
+<li>杜绝缓冲区溢出</li>
+</ul>
+</li>
+<li>链表</li>
+<li>字典</li>
+<li>跳跃表</li>
+<li>整数集合（intset）<ul>
+<li>不包含重复项</li>
+<li>从小到大有序排列</li>
+</ul>
+</li>
+<li>压缩列表（ziplist）<ul>
+<li>压缩列表是为了节约内存而开发的，是由一系列特殊编码的连续内存块组成的顺序性数据结构</li>
+<li>压缩链表可以包含多个节点，每个节点可以保存一个字节数组或整数值。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis对象类型"><a href="#Redis对象类型" class="headerlink" title="Redis对象类型"></a>Redis对象类型</h2><ul>
+<li>字符串对象 string</li>
+<li>列表对象 list<ul>
+<li>当列表元素较少时，使用压缩列表作为底层实现（所有字符串长度都小于64KB，且元素数量小于512）</li>
+<li>当列表元素较多时，使用双端链表作为底层实现</li>
+</ul>
+</li>
+<li>哈希对象 hash<ul>
+<li>当所有键值对的键和值的字符串长度都小于64KB，且键值对数量小于512时，哈希对象采用压缩列表作为底层实现，每对键值保存在相邻位置。</li>
+<li>否则采用hashtable编码，即采用字典作为底层实现，字典的每个键值都是字符串对象。</li>
+</ul>
+</li>
+<li>集合对象 set<ul>
+<li>当所有元素都是整数值且个数不超过512时，采用intset作为底层实现。</li>
+<li>否则采用hashtable编码，即字典作为底层实现，字典的键对应集合中的元素，字典的值全部为NULL</li>
+</ul>
+</li>
+<li>有序集合对象 zset<ul>
+<li>当所有元素的长度小于64KB且数量小于128个时，采用ziplist作为底层实现</li>
+<li>否则采用zset作为底层实现，zset结构同时包含一个字典和一个跳跃表，这两种数据结构通过指针共享相同的元素成员和分值。</li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis的内存回收机制"><a href="#Redis的内存回收机制" class="headerlink" title="Redis的内存回收机制"></a>Redis的内存回收机制</h2><ul>
+<li><p>引用计数机制：</p>
+<ul>
+<li>创建一个新对象时，引用计数的值被初始化为1</li>
+<li>对象被一个新程序使用时，引用计数值加1</li>
+<li>对象不再被一个程序使用时，引用计数值减1</li>
+<li>对象的引用计数值为0时，对象所占用的内存会被释放<h2 id="Redis的对象共享机制"><a href="#Redis的对象共享机制" class="headerlink" title="Redis的对象共享机制"></a>Redis的对象共享机制</h2></li>
+</ul>
+</li>
+<li><p>Redis中，多个键可以共享同一个值对象：</p>
+<ul>
+<li>将数据库的键指针指向一个现有的值对象</li>
+<li>并将被共享的值对象的引用计数加1</li>
+</ul>
+</li>
+<li><p>redis在初始化服务器时会创建一万个字符串对象，包含了从0-9999的所有整数值，当服务器要用到这些字符串对象时直接引用就可以了。</p>
+</li>
+</ul>
+<h2 id="Redis的复制"><a href="#Redis的复制" class="headerlink" title="Redis的复制"></a>Redis的复制</h2><p>即主从服务器的同步。</p>
+<ul>
+<li>旧版复制功能：<ul>
+<li>SYNC命令：<ul>
+<li>主服务器执行BGSAVE命令生成RDB文件，此过程消耗大量的CPU、内存和磁盘I/O资源</li>
+<li>发送RDB文件给从服务器，消耗网络资源</li>
+<li>从服务器载入RDB文件时会因为阻塞而无法处理命令请求</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>新版复制功能：<ul>
+<li>完整重同步：<ul>
+<li>初次复制时使用完整重同步，操作与SYNC命令相同。</li>
+</ul>
+</li>
+<li>部分重同步：<ul>
+<li>用于断线后重新复制的情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis源码探究"><a href="#Redis源码探究" class="headerlink" title="Redis源码探究"></a>Redis源码探究</h2><h3 id="Redis服务器"><a href="#Redis服务器" class="headerlink" title="Redis服务器"></a>Redis服务器</h3><ol>
+<li><strong>server.h:</strong> redisServer结构体中含有服务器全局信息的相关属性</li>
+<li><strong>server.c/main:</strong> 程序创建一个redisServer结构的实例变量 server ， 调用函数 initServerConfig() , 将 server 的各个属性初始化为默认值。</li>
+<li><strong>server.c/main:</strong> 读入配置文件及参数设置等，打印log</li>
+<li><strong>server.c/main:</strong> 配置完毕后启动aeMain，进入时间循环</li>
+<li><strong>ae.c/aeMain:</strong> 循环执行aeProcessEvents直到接收到stop信号</li>
+<li><strong>ae.c/aeProcessEvents:</strong> 调用multiplexing API – aeApiPoll，只有当超时或某些事件被触发时才会返回。</li>
+<li><strong>ae_epoll.c/aeApiPoll:</strong> 调用epoll_wait接收请求，返回事件数量</li>
+<li><strong>ae.c/aeProcessEvents:</strong> 根据返回的事件数量处理队列中的事件。一般情况下，首先处理读事件，再处理写事件。</li>
+</ol>
+<p>由于采用了I/O多路复用技术，即使有多个连接存在，Redis服务器在处理网络请求时也是单进程单线程的。</p>
+<ul>
+<li>优点：<ul>
+<li>代码更清晰，处理逻辑更简单</li>
+<li>不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
+<li>不存在多进程或者多线程导致的切换而消耗CPU</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>无法发挥多核CPU性能，不过可以通过在单机开多个Redis实例来完善；</li>
+<li>（主从服务器如果部署在同一节点上，是否就失去了实用意义？）</li>
+</ul>
+</li>
 </ul>
 
       
@@ -517,7 +628,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -528,7 +639,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -588,7 +699,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#了解Redis"><span class="nav-number">1.</span> <span class="nav-text">了解Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis介绍"><span class="nav-number">1.1.</span> <span class="nav-text">Redis介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis特点"><span class="nav-number">1.2.</span> <span class="nav-text">Redis特点</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#了解Redis"><span class="nav-number">1.</span> <span class="nav-text">了解Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis介绍"><span class="nav-number">1.1.</span> <span class="nav-text">Redis介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis特点"><span class="nav-number">1.2.</span> <span class="nav-text">Redis特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis支持的数据结构"><span class="nav-number">1.3.</span> <span class="nav-text">Redis支持的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis对象类型"><span class="nav-number">1.4.</span> <span class="nav-text">Redis对象类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的内存回收机制"><span class="nav-number">1.5.</span> <span class="nav-text">Redis的内存回收机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的对象共享机制"><span class="nav-number">1.6.</span> <span class="nav-text">Redis的对象共享机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的复制"><span class="nav-number">1.7.</span> <span class="nav-text">Redis的复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis源码探究"><span class="nav-number">1.8.</span> <span class="nav-text">Redis源码探究</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis服务器"><span class="nav-number">1.8.1.</span> <span class="nav-text">Redis服务器</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
