@@ -9,7 +9,7 @@ copyright:
 # 了解Redis
 
 ## Redis介绍
-REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。
+REmote Dictionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。
 
 Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。
 
