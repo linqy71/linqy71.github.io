@@ -39,7 +39,7 @@ copyright:
 6. 后台查看server运行状态
    ` ps -fu username ` 可以查看用户名下运行的所有进程
 
-   ![](./Redis环境配置/ps-result.png)
+   ![](Redis环境配置/ps-result.png)
 
 7. 启动后客户端连接服务器
    ` redis-cli -h xxx -p xxx `
@@ -82,12 +82,16 @@ copyright:
    其余5个server节点类似。
 4. 查看集群：
    ` 6379> cluster nodes `
-   ![](./Redis环境配置/cluster-nodes.png)
+   ![](Redis环境配置/cluster-nodes.png)
 5. 测试集群：
    ` 6379> set university "SYSU" `
-   ![](./Redis环境配置/test-set.jpg)
+   ![](Redis环境配置/test-set.jpg)
 6. 使用benchmark测试集群：
-   ![](./Redis环境配置/test-benchmark.png)
+   ![](Redis环境配置/test-benchmark.png)
+
+**集群启动方法二：**
+
+` redis-cli --cluster create host1:port1 host2:port2 ... `
 
 ## 监控集群
 

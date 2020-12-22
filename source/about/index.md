@@ -16,4 +16,4 @@ header-img: "/img/header_img/about.png"
 “北极里有一束光，你话留来伴我望，我若觉得绝望，想到亦会全释放”
 
 ### 联系我
-2575769386@qq.com
+linqy35@mail2.sysu.edu.cn
