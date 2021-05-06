@@ -1,8 +1,8 @@
 ---
-title: 阅读笔记 ：Energy Transparency for Deeply Embedded Programs
+title: 论文阅读笔记 ：Energy Transparency for Deeply Embedded Programs
 date: 2019-03-31 14:29:35
 tags: IoT energy LLVM-IR 
-categories: 阅读笔记
+categories: 论文阅读
 copyright: true
 ---
 

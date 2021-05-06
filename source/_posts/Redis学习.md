@@ -2,7 +2,7 @@
 title: Redis学习
 date: 2020-07-06 14:10:18
 tags: Redis
-categories: 论文阅读
+categories: 源码分析
 copyright:
 ---
 

@@ -2,7 +2,7 @@
 title: 读《华盖集》
 date: 2020-11-25 15:49:42
 tags: 鲁迅 杂文
-categories: 读书笔记
+categories: 文学
 copyright: true
 ---
 

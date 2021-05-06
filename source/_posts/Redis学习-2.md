@@ -2,7 +2,7 @@
 title: Redis学习-2
 date: 2020-09-14 19:32:40
 tags: Redis 
-categories: 设计原理
+categories: 源码分析
 copyright:
 ---
 

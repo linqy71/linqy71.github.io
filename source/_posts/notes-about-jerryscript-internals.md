@@ -2,7 +2,7 @@
 title: 阅读笔记 ：jerryscript-internals
 date: 2019-03-31 14:41:32
 tags: jerryscript
-categories: 阅读笔记
+categories: 源码分析
 copyright: true
 ---
 

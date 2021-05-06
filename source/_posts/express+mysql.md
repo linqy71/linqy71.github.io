@@ -2,7 +2,7 @@
 title: nodejs + express + mysql搭建restful风格api
 date: 2019-01-18 2:03:23
 tags: express nodejs mysql webapi
-categories: nodejs
+categories: 开发记录
 copyright: true
 ---
 

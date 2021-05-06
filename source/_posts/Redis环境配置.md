@@ -2,7 +2,7 @@
 title: Redis环境配置
 date: 2020-10-04 14:54:14
 tags: Redis, centos
-categories: 操作笔记
+categories: 操作记录
 copyright:
 ---
 

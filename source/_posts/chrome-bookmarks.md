@@ -2,7 +2,7 @@
 title: 把bookmarks等用户数据重新导入chrome
 date: 2019-02-16 19:24:44
 tags: chrome 书签 浏览记录 导入
-categories: 随笔
+categories: 操作记录
 copyright: true
 ---
 
@@ -14,5 +14,5 @@ copyright: true
 
 3. 将旧硬盘中Chrome的User Data文件夹复制到`C:\Users\用户名\AppData\Local\Google\Chrome`，覆盖刚刚安装的Chrome的数据文件，(如果出现一些提示说无法移动 直接跳过就可以了)，然后重新启动Chrome
 
-4. 这时候就会发现所有的书签以及浏览记录等数据全都回来了，你的Chrome又是从前爱的那个Chrome了。 
+4. 这时候就会发现所有的书签以及浏览记录等数据全都回来了。 
 
