@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="Redis,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="深入理解RedisRedis阻塞 Redis 是典型的单线程架构，所有的读写操作都是在一条主线程中完成的。当Redis用于高并发场景时，阻塞问题至关重要。  导致阻塞的原因 内在原因：不合理地使用API或数据结构、CPU饱和、持久化阻塞等 外在原因：CPU竞争、内存交换、网络问题等  CPU饱和 单线程的Redis处理命令时只能使用一个CPU，CPU饱和是指Redis把单核CPU使用率跑到接近10">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习-2">
+<meta property="og:url" content="linqy71.github.io/2020/09/14/Redis学习-2/index.html">
+<meta property="og:site_name" content="曲率飞行">
+<meta property="og:description" content="深入理解RedisRedis阻塞 Redis 是典型的单线程架构，所有的读写操作都是在一条主线程中完成的。当Redis用于高并发场景时，阻塞问题至关重要。  导致阻塞的原因 内在原因：不合理地使用API或数据结构、CPU饱和、持久化阻塞等 外在原因：CPU竞争、内存交换、网络问题等  CPU饱和 单线程的Redis处理命令时只能使用一个CPU，CPU饱和是指Redis把单核CPU使用率跑到接近10">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-03-25T16:54:52.179Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习-2">
+<meta name="twitter:description" content="深入理解RedisRedis阻塞 Redis 是典型的单线程架构，所有的读写操作都是在一条主线程中完成的。当Redis用于高并发场景时，阻塞问题至关重要。  导致阻塞的原因 内在原因：不合理地使用API或数据结构、CPU饱和、持久化阻塞等 外在原因：CPU竞争、内存交换、网络问题等  CPU饱和 单线程的Redis处理命令时只能使用一个CPU，CPU饱和是指Redis把单核CPU使用率跑到接近10">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2020/09/14/Redis学习-2/">
+
+
+
+
+
+  <title>Redis学习-2 | 曲率飞行</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曲率飞行</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/09/14/Redis学习-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曲率飞行">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis学习-2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-14T19:32:40+08:00">
+                2020-09-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/源码分析/" itemprop="url" rel="index">
+                    <span itemprop="name">源码分析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,617
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  6
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="深入理解Redis"><a href="#深入理解Redis" class="headerlink" title="深入理解Redis"></a>深入理解Redis</h1><h2 id="Redis阻塞"><a href="#Redis阻塞" class="headerlink" title="Redis阻塞"></a>Redis阻塞</h2><blockquote>
+<p><strong>Redis 是典型的单线程架构</strong>，所有的读写操作都是在一条主线程中完成的。当Redis用于高并发场景时，阻塞问题至关重要。</p>
+</blockquote>
+<h3 id="导致阻塞的原因"><a href="#导致阻塞的原因" class="headerlink" title="导致阻塞的原因"></a>导致阻塞的原因</h3><ul>
+<li>内在原因：不合理地使用API或数据结构、CPU饱和、持久化阻塞等</li>
+<li>外在原因：CPU竞争、内存交换、网络问题等</li>
+</ul>
+<h4 id="CPU饱和"><a href="#CPU饱和" class="headerlink" title="CPU饱和"></a>CPU饱和</h4><p> <strong>单线程的Redis处理命令时只能使用一个CPU</strong>，CPU饱和是指Redis把单核CPU使用率跑到接近100%。CPU饱和导致Redis无法处理更多命令。</p>
+<p> 解决方法有：</p>
+<ul>
+<li>采用集群分摊OPS压力（Operations per Second）</li>
+<li>检查是否存在过度的内存优化，例如为了节省内存使用ziplist代替hash</li>
+<li>检查是否采用了高算法复杂度的命令</li>
+</ul>
+<h4 id="CPU竞争"><a href="#CPU竞争" class="headerlink" title="CPU竞争"></a>CPU竞争</h4><ul>
+<li>进程竞争：当Redis与其它多核CPU密集型服务部署在一起，会出现竞争CPU资源的情况。</li>
+<li>绑定CPU：<strong>部署Redis时为了充分利用多核CPU，通常一台机器会部署多个实例。常见的一种优化是把Redis进程绑定到CPU上，用于降低CPU频繁上下文切换的开销。</strong><ul>
+<li>但是当Redis父进程创建子进程进行持久化时，如果作了CPU绑定，子进程与父进程就会在同一个CPU上进行，从而使得子进程与父进程抢夺CPU资源。<strong>因此对于开启了持久化或参与复制的主节点不建议绑定CPU。</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis内存"><a href="#Redis内存" class="headerlink" title="Redis内存"></a>Redis内存</h2><ul>
+<li>Redis实际内存消耗主要包括：键值对象、缓冲区内存、内存碎片。<ul>
+<li>缓冲内存包括：客户端缓冲、复制积压缓冲、AOF缓冲区 </li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis事件处理"><a href="#Redis事件处理" class="headerlink" title="Redis事件处理"></a>Redis事件处理</h2><p>Redis服务器是典型的事件驱动程序。其中，事件分为文件事件和时间事件，事件封装在结构体<em>aeEventLoop</em>中。</p>
+<p>Redis底层使用4中I/O多路复用模型（evport, select, kqueue, epoll），并对这4种模型进一步封装。</p>
+<p>事件循环执行函数的主要逻辑：</p>
+<ul>
+<li>查找最早会发生的时间事件，计算超时时间</li>
+<li>阻塞等待文件事件的产生</li>
+<li>处理文件事件</li>
+<li>处理时间事件</li>
+</ul>
+<h3 id="文件事件"><a href="#文件事件" class="headerlink" title="文件事件"></a>文件事件</h3><p>Redis客户端通过TCP socket与服务端交互，文件事件指的就是socket的可读可写事件。为了同时处理多条网络连接，采用较为成熟的I/O多路复用模型。</p>
+<h4 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h4><blockquote>
+<p>epoll是linux内核为处理大量并发网络连接而提出的解决方案，能显著提升系统CPU利用率。</p>
+</blockquote>
+<ul>
+<li>epoll_create: 创建一个epoll专用的文件描述符</li>
+<li>epoll_ctl: 注册、修改或删除需要监控的事件</li>
+<li>epoll_wait: 阻塞进程知道监控的若干网络连接有事件发生</li>
+</ul>
+<h3 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h3><p>本质上，Redis只有一个时间事件——serverCron。该函数实现了Redis服务器所有定时任务的周期执行。</p>
+<h2 id="Redis-Server启动过程"><a href="#Redis-Server启动过程" class="headerlink" title="Redis Server启动过程"></a>Redis Server启动过程</h2><h3 id="Server初始化"><a href="#Server初始化" class="headerlink" title="Server初始化"></a>Server初始化</h3><ul>
+<li>初始化配置，包括用户可配置的参数以及命令表的初始化</li>
+<li>加载并解析配置文件</li>
+<li>初始化服务端内部变量，其中包括数据库。</li>
+<li>创建事件循环eventLoop</li>
+<li>创建socket并启动监听</li>
+<li>创建文件事件与时间事件</li>
+<li>开启事件循环</li>
+</ul>
+<h2 id="Redis-数据分区"><a href="#Redis-数据分区" class="headerlink" title="Redis 数据分区"></a>Redis 数据分区</h2><p>当单台机器的可用内存里无法装载大型数据库或者数据集时，数据分区就成为了一种重要策略，它将键进行分割并指派给特定的Redis实例。通过分区这一方式，单一的Redis实例的计算能力和资源将不再成为限制。</p>
+<h3 id="数据分区的方法"><a href="#数据分区的方法" class="headerlink" title="数据分区的方法"></a>数据分区的方法</h3><h4 id="客户端分区"><a href="#客户端分区" class="headerlink" title="客户端分区"></a>客户端分区</h4><p>分区逻辑包含在客户端代码中，基于算法或者存储的额外信息来选择正确的分区或Redis节点。<br>常见的策略有：</p>
+<ul>
+<li>范围分区：为每个Redis实例指定键的范围。会带来额外的成本，包括用户追踪分区的Redis bitstring数据结构，以及定制开发的客户端代码</li>
+<li>列表分区：为分区指定一个列表值。与范围分区类似，列表分区同样需要中间数据结构来支持数据存储中 键的分配与追踪。</li>
+<li>哈希分区：根据键和哈希算法计算出值，并基于数据存储中的分区数量或可用实例数对该值进行取模。</li>
+<li>复合分区：结合不同分区方法进行分区。<h4 id="辅助代理分区"><a href="#辅助代理分区" class="headerlink" title="辅助代理分区"></a>辅助代理分区</h4>Redis客户端连接到代理中间件，再由它将客户端请求路由到正确的Redis节点。</li>
+</ul>
+<p><strong>Twemproxy：</strong><br>Twemproxy是一个由Twitter发布的开源项目，旨在创建客户端和由memcache或者Redis实例组成的服务器端间的缓存代理。<br>Twemproxy通过采用中间件的方式，分离客户端调用和数据存储后端</p>
+<h4 id="查询路由"><a href="#查询路由" class="headerlink" title="查询路由"></a>查询路由</h4><ul>
+<li>任一客户端查询集群中的随即节点将会被路由到包含正确键的正确节点上，这是Redis集群当前的实现方式。</li>
+</ul>
+<h2 id="Redis集群"><a href="#Redis集群" class="headerlink" title="Redis集群"></a>Redis集群</h2><p>Redis在大规模分布式计算中主要面临两个问题：</p>
+<ul>
+<li>如何将数据分区到N个Redis实例中去</li>
+<li>如何优雅地处理某些情况下的节点故障</li>
+</ul>
+<p>Redis集群不提供健壮的一致性保证，也就是说在传播数据时数据可能丢失。</p>
+<p>Redis集群默认运行的传播模式是异步的流程（在与客户端交互期间，Redis集群会继续写操作）。在主从节点的配置下，集群的性能胜于数据的一致性。如果数据的一致性对于应用程序来说比性能更重要，那么Redis集群提供的WAIT命令可以用来将数据传播的方式变更成同步流程。</p>
+<p>当Redis集群在运行时，当中的每个节点会打开两个TCP socket。第一个用于连接客户端的标准Redis协议，默认端口是6379。第二个端口是由第一个端口加上10000所得（默认16379），运行着用于节点间通信的二进制协议。</p>
+<p>Redis集群中的节点使用Redis集群总线在网状网络拓扑结构中与其他节点连接。</p>
+<p><strong>参考文献</strong></p>
+<ul>
+<li>《Redis开发与运维》</li>
+<li>《Redis 5设计与源码分析》</li>
+<li>《深入理解Redis》</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/08/Google论文-Bigtable阅读笔记/" rel="next" title="Google论文-Bigtable阅读笔记">
+                <i class="fa fa-chevron-left"></i> Google论文-Bigtable阅读笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/02/读《悲剧的诞生》/" rel="prev" title="读《悲剧的诞生》">
+                读《悲剧的诞生》 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#深入理解Redis"><span class="nav-number">1.</span> <span class="nav-text">深入理解Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis阻塞"><span class="nav-number">1.1.</span> <span class="nav-text">Redis阻塞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#导致阻塞的原因"><span class="nav-number">1.1.1.</span> <span class="nav-text">导致阻塞的原因</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CPU饱和"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">CPU饱和</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CPU竞争"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">CPU竞争</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis内存"><span class="nav-number">1.2.</span> <span class="nav-text">Redis内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis事件处理"><span class="nav-number">1.3.</span> <span class="nav-text">Redis事件处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件事件"><span class="nav-number">1.3.1.</span> <span class="nav-text">文件事件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#epoll"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">epoll</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#时间事件"><span class="nav-number">1.3.2.</span> <span class="nav-text">时间事件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Server启动过程"><span class="nav-number">1.4.</span> <span class="nav-text">Redis Server启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Server初始化"><span class="nav-number">1.4.1.</span> <span class="nav-text">Server初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-数据分区"><span class="nav-number">1.5.</span> <span class="nav-text">Redis 数据分区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据分区的方法"><span class="nav-number">1.5.1.</span> <span class="nav-text">数据分区的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端分区"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">客户端分区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#辅助代理分区"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">辅助代理分区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查询路由"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">查询路由</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis集群"><span class="nav-number">1.6.</span> <span class="nav-text">Redis集群</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

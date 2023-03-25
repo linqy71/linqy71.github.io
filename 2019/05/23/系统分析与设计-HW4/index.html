@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="系统分析与设计,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HW4简答题 用例的概念  Use case is a collection of related success and failure scenarios that describe an actor using a system to support a goal.   用例和场景的关系？什么是主场景或 happy path？  Scenario is a specific sequence">
+<meta name="keywords" content="系统分析与设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统分析与设计-HW4">
+<meta property="og:url" content="linqy71.github.io/2019/05/23/系统分析与设计-HW4/index.html">
+<meta property="og:site_name" content="曲率飞行">
+<meta property="og:description" content="HW4简答题 用例的概念  Use case is a collection of related success and failure scenarios that describe an actor using a system to support a goal.   用例和场景的关系？什么是主场景或 happy path？  Scenario is a specific sequence">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="/2019/05/23/系统分析与设计-HW4/usecase.png">
+<meta property="og:image" content="/2019/05/23/系统分析与设计-HW4/xiecheng.jpg">
+<meta property="og:image" content="/2019/05/23/系统分析与设计-HW4/didi.jpg">
+<meta property="og:updated_time" content="2023-03-25T16:54:52.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统分析与设计-HW4">
+<meta name="twitter:description" content="HW4简答题 用例的概念  Use case is a collection of related success and failure scenarios that describe an actor using a system to support a goal.   用例和场景的关系？什么是主场景或 happy path？  Scenario is a specific sequence">
+<meta name="twitter:image" content="/2019/05/23/系统分析与设计-HW4/usecase.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2019/05/23/系统分析与设计-HW4/">
+
+
+
+
+
+  <title>系统分析与设计-HW4 | 曲率飞行</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曲率飞行</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2019/05/23/系统分析与设计-HW4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曲率飞行">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">系统分析与设计-HW4</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-23T14:20:41+08:00">
+                2019-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统分析与设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统分析与设计</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,067
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HW4"><a href="#HW4" class="headerlink" title="HW4"></a>HW4</h1><h2 id="简答题"><a href="#简答题" class="headerlink" title="简答题"></a>简答题</h2><ol>
+<li><p>用例的概念</p>
+<ul>
+<li>Use case is a collection of related success and failure scenarios that describe an actor using a system to support a goal.</li>
+</ul>
+</li>
+<li><p>用例和场景的关系？什么是主场景或 happy path？</p>
+<ul>
+<li>Scenario is a specific sequence of actions and<br>interactions between actors and the system; it is also called a use<br>case instance. A use case represents a collection of scenarios.</li>
+<li>The primary scenario（主场景／基本流） corresponds to the main system interactions, usually the ‘success’ scenario.</li>
+</ul>
+</li>
+<li><p>用例有哪些形式？</p>
+<ul>
+<li>Three Common Use Case Formats : Brief, Casual, Fully</li>
+</ul>
+</li>
+<li><p>对于复杂业务，为什么编制完整用例非常难？</p>
+<ul>
+<li>复杂业务设计的场景较多</li>
+</ul>
+</li>
+<li><p>什么是用例图？</p>
+<ul>
+<li>用例图是指由参与者（Actor）、用例（Use Case），边界以及它们之间的关系构成的用于描述系统功能的视图。</li>
+</ul>
+</li>
+<li><p>用例图的基本符号与元素？</p>
+<ul>
+<li><p><img src="/2019/05/23/系统分析与设计-HW4/usecase.png" alt></p>
+</li>
+<li><p>用例图包含六个基本元素：参与者(Actor)、用例(Use Case)、关联关系(Association)、包含关系(Include)、扩展关系(Extend)以及泛化关系(Generalization)</p>
+</li>
+</ul>
+</li>
+<li><p>用例图的画法与步骤</p>
+<ul>
+<li>确定参与者：在获取用例前首先要确定系统的参与者</li>
+<li>识别用例：特定参与者希望系统提供什么功能，由哪个参与者触发、当系统改变状态时，是否通知参与者、是否存在影响系统的外部事件等。一般以动词开头描述某件事情。</li>
+<li>确定用例间关系：确定用例间的关联关系、包含关系、扩展关系、泛化关系</li>
+<li>识别外部系统和服务</li>
+</ul>
+</li>
+<li><p>用例图给利益相关人与开发者的价值有哪些？</p>
+<ul>
+<li>合理的用例识别（制作的用例图），通常给团队带来以下利益：<ul>
+<li>明确系统的业务范围、服务对象（角色）、外部系统与设备；</li>
+<li>帮助识别技术风险，提前实施关键技术原型公关与学习；</li>
+<li>易于评估项目工作量，合理规划迭代周期，规划人力需要；</li>
+</ul>
+</li>
+<li>用例图能够让利益相关人更直观地了解到系统所能带来的好处</li>
+</ul>
+</li>
+</ol>
+<h2 id="建模练习题（用例模型）"><a href="#建模练习题（用例模型）" class="headerlink" title="建模练习题（用例模型）"></a>建模练习题（用例模型）</h2><blockquote>
+<p>选择2-3个你熟悉的类似业务的在线服务系统（或移动 APP），如定旅馆（携程、去哪儿等）、定电影票、背单词APP等，分别绘制它们用例图。并满足以下要求：<br>请使用用户的视角，描述用户目标或系统提供的服务<br>粒度达到子用例级别，并用 include 和 exclude 关联它们<br>请用色彩标注出你认为创新（区别于竞争对手的）用例或子用例<br>尽可能识别外部系统和服务</p>
+</blockquote>
+<p><img src="/2019/05/23/系统分析与设计-HW4/xiecheng.jpg" alt></p>
+<p><img src="/2019/05/23/系统分析与设计-HW4/didi.jpg" alt></p>
+<ol>
+<li><p>为什么相似系统的用例图是相似的？<br>因为相似的系统要实现的功能是相似的，业务逻辑相似，很多场景也一致，只是针对的对象不同。</p>
+</li>
+<li><p>如果是定旅馆业务，请对比 Asg_RH 用例图，简述如何利用不同时代、不同地区产品的用例图，展现、突出创新业务和技术.<br>可以利用大数据分析，根据用户喜好，用户来自哪里，为用户推荐适合用户风格的酒店。</p>
+</li>
+<li><p>如何利用用例图定位创新思路（业务创新、或技术创新、或商业模式创新）在系统中的作用<br>用色彩标注出创新的用例或子用例，从而突出创新思路。</p>
+</li>
+<li><p>请使用 SCRUM 方法，选择一个用例图，编制某定旅馆开发的需求（backlog）开发计划表</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Id</th>
+<th>Name</th>
+<th>Imp</th>
+<th>Est</th>
+<th>How to demo</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>查找旅馆</td>
+<td>25</td>
+<td>3</td>
+<td>可按地点、日期查找旅馆</td>
+<td>调用地图API进行定位</td>
+</tr>
+<tr>
+<td>2</td>
+<td>下订单</td>
+<td>20</td>
+<td>2</td>
+<td>选择好旅馆、房间类型和日期等信息后确认提交订单</td>
+</tr>
+<tr>
+<td>3</td>
+<td>支付订单</td>
+<td>25</td>
+<td>2</td>
+<td>选择支付方式进行付款，可使用银行卡支付、微信支付、支付宝支付</td>
+<td>需要调用外部系统的支付API</td>
+</tr>
+<tr>
+<td>4</td>
+<td>登录</td>
+<td>20</td>
+<td>1</td>
+<td>人脸识别</td>
+<td>需要调用相关接口</td>
+</tr>
+</tbody>
+</table>
+<ol start="5">
+<li>根据任务4，参考 使用用例点估算软件成本，给出项目用例点的估算</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th># 业务</th>
+<th># 计算</th>
+<th>原因</th>
+<th>UC 权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>查找旅馆</td>
+<td>4</td>
+<td>3</td>
+<td></td>
+<td>简单</td>
+</tr>
+<tr>
+<td>下订单</td>
+<td>5</td>
+<td>5</td>
+<td></td>
+<td>平均</td>
+</tr>
+<tr>
+<td>支付订单</td>
+<td>5</td>
+<td>3</td>
+<td></td>
+<td>简单</td>
+</tr>
+<tr>
+<td>登录</td>
+<td>1</td>
+<td>1</td>
+<td></td>
+<td>简单</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2019/05/23/系统分析与设计-HW4/">系统分析与设计-HW4</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 清音 的个人博客">清音</a></p>
+  <p><span>发布时间:</span>2019年05月23日 - 14:05</p>
+  <p><span>最后更新:</span>2023年03月26日 - 00:03</p>
+  <p><span>原始链接:</span><a href="/2019/05/23/系统分析与设计-HW4/" title="系统分析与设计-HW4">linqy71.github.io/2019/05/23/系统分析与设计-HW4/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2019/05/23/系统分析与设计-HW4/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	});
+    });  
+</script>
+
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/系统分析与设计/" rel="tag"><i class="fa fa-tag"></i> 系统分析与设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/18/系统分析与设计-HW3/" rel="next" title="系统分析与设计-HW3">
+                <i class="fa fa-chevron-left"></i> 系统分析与设计-HW3
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/25/系统分析与设计-HW5/" rel="prev" title="系统分析与设计-HW5">
+                系统分析与设计-HW5 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HW4"><span class="nav-number">1.</span> <span class="nav-text">HW4</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简答题"><span class="nav-number">1.1.</span> <span class="nav-text">简答题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建模练习题（用例模型）"><span class="nav-number">1.2.</span> <span class="nav-text">建模练习题（用例模型）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

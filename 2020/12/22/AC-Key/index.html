@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="cache, LSM-Tree,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="AC-Key: Adaptive Caching for LSM-based Key-Value Stores USENIX ATC’20Fenggang Wu, Ming-Hong Yang, Baoquan Zhang, and David H.C. Du, University of Minnesotahttps://www.usenix.org/conference/atc20/prese">
+<meta name="keywords" content="cache, LSM-Tree">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AC-Key阅读笔记">
+<meta property="og:url" content="linqy71.github.io/2020/12/22/AC-Key/index.html">
+<meta property="og:site_name" content="曲率飞行">
+<meta property="og:description" content="AC-Key: Adaptive Caching for LSM-based Key-Value Stores USENIX ATC’20Fenggang Wu, Ming-Hong Yang, Baoquan Zhang, and David H.C. Du, University of Minnesotahttps://www.usenix.org/conference/atc20/prese">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="/2020/12/22/AC-Key/lsm.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/arc.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/cache_type.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/challenge.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/E.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/b.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/m.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/component.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/hac.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/offline.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/adaptive.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/cache_size.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/value_size.png">
+<meta property="og:image" content="/2020/12/22/AC-Key/hot_ratio.png">
+<meta property="og:updated_time" content="2023-03-25T16:54:52.165Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AC-Key阅读笔记">
+<meta name="twitter:description" content="AC-Key: Adaptive Caching for LSM-based Key-Value Stores USENIX ATC’20Fenggang Wu, Ming-Hong Yang, Baoquan Zhang, and David H.C. Du, University of Minnesotahttps://www.usenix.org/conference/atc20/prese">
+<meta name="twitter:image" content="/2020/12/22/AC-Key/lsm.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2020/12/22/AC-Key/">
+
+
+
+
+
+  <title>AC-Key阅读笔记 | 曲率飞行</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曲率飞行</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/12/22/AC-Key/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曲率飞行">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AC-Key阅读笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-22T11:28:40+08:00">
+                2020-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,044
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="AC-Key-Adaptive-Caching-for-LSM-based-Key-Value-Stores"><a href="#AC-Key-Adaptive-Caching-for-LSM-based-Key-Value-Stores" class="headerlink" title="AC-Key: Adaptive Caching for LSM-based Key-Value Stores"></a>AC-Key: Adaptive Caching for LSM-based Key-Value Stores</h1><blockquote>
+<p>USENIX ATC’20<br>Fenggang Wu, Ming-Hong Yang, Baoquan Zhang, and David H.C. Du, University of Minnesota<br><a href="https://www.usenix.org/conference/atc20/presentation/wu-fenggang" target="_blank" rel="noopener">https://www.usenix.org/conference/atc20/presentation/wu-fenggang</a></p>
+</blockquote>
+<h2 id="key-word"><a href="#key-word" class="headerlink" title="key word"></a>key word</h2><ul>
+<li>使用cache来提升基于LSM Tree的KV store读性能</li>
+<li>ARC算法</li>
+<li>cache benefit and cache cost</li>
+</ul>
+<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><h3 id="LSM-Tree"><a href="#LSM-Tree" class="headerlink" title="LSM Tree"></a>LSM Tree</h3><p>特点：写友好，读不友好</p>
+<p><img src="/2020/12/22/AC-Key/lsm.png" alt></p>
+<p>LSM Tree基本原理：<br>总体来说，LSM Tree分为两部分，一部分存在于DRAM——MemTable，一部分存在于Storage——SST files。KV（Key-Value）对存储在一个一个的Data Block中。当DRAM中的MemTable满了之后，会通过flush操作将数据刷到Storage中。Storage中的SSTable以树状形式排列，flush操作会首先将数据刷到L0的一个SST中。当L0满后通过compaction操作将数据merge到L1中，以此类推。同时，每个SSTable中存放的不只是data block，还包括BF block——布隆过滤器，以及Index Block——当前SSTable 存放的Key的索引。以及Storage中的每一个level（除L0外）会有一个特殊的文件包含了该层所有SSTable存储的Key范围。</p>
+<p>这就导致LSM Tree在查找数据时需要读出多个块，即经过多次storage I/O，才能查找出结果，开销较大。</p>
+<h3 id="ARC"><a href="#ARC" class="headerlink" title="ARC"></a>ARC</h3><p>一种使用ghost cache动态调整cache大小的算法</p>
+<p><img src="/2020/12/22/AC-Key/arc.png" alt></p>
+<p>ARC基本原理：<br>首先，Cache中维护了4个LRU，2个以Frequency为策略, 2个以Recency为策略。图中的方框表示Real Cache，里面存放了真实的数据，横线表示Ghost cache，其size相对较小，存放的是从Real cache中被剔除的数据的元数据，例如page number等。当Recency侧的ghost cache命中时，该数据应被放回到Recency real cache中，因此Recency real cache的size需要增大，动态的boundary需要向Frequency侧移动；同理，当Frequency侧的ghost cache命中时boundary向Recency侧移动，从而达到cache size的动态自适应。</p>
+<h3 id="LSM-–-read"><a href="#LSM-–-read" class="headerlink" title="LSM – read"></a>LSM – read</h3><p>基于LSM Tree的KV Store的读请求有两种类型：</p>
+<ul>
+<li>point lookup 点查找：单个KV对</li>
+<li>range query 范围查找：范围内多个KV对</li>
+</ul>
+<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><h3 id="Cache-item-type"><a href="#Cache-item-type" class="headerlink" title="Cache item type"></a>Cache item type</h3><ol>
+<li>首先，Cache中可以存放的item类型有三种：</li>
+</ol>
+<ul>
+<li>block（basic I/O unit），例如data block，BF block，index block</li>
+<li>KV，即Key Value对</li>
+<li>KP，即Key Pointer对，pointer为指向storage的指针，实际数据需要经过一次storage I/O才能获取。</li>
+</ul>
+<p><img src="/2020/12/22/AC-Key/cache_type.png" alt></p>
+<ol start="2">
+<li>这三种类型的cache有各自的特点：</li>
+</ol>
+<ul>
+<li>block能存放多个有序的KV对，非常适合范围查找。</li>
+<li>KV cache存放了一个一个的KV对，不需要额外的I/O即可读出数据，适合点查找，但当Value的size较大时空间利用率较低，因此适用于value size较小的情况。</li>
+<li>KP cache将Value转变为指针，尽管需要一次I/O，但cache的空间利用率大，适用于点查找中value size较大的情况。</li>
+<li>同时，相比KP cache来说，KV cache应对热点问题更加有效。</li>
+</ul>
+<ol start="3">
+<li>目前存在的问题：<br><img src="/2020/12/22/AC-Key/challenge.png" alt></li>
+</ol>
+<ul>
+<li>目前较为成熟的几个产品例如LevelDB, RocksDB, Cassandra，都只实现了三种cache类型中的一种或两种，不能够很好地兼容点查找和范围查找，并且无法动态调整大小。</li>
+</ul>
+<ol start="4">
+<li>因此，本文提出，<strong>Key Challenge is:</strong></li>
+</ol>
+<ul>
+<li><strong>adjust the size of different types of caches according to dynamic workloads</strong></li>
+</ul>
+<h3 id="cache-efficiency"><a href="#cache-efficiency" class="headerlink" title="cache efficiency"></a>cache efficiency</h3><p>另外，基于LSM Tree的特点，使用cache来提高读性能还需要考虑<strong>cache benefit与cache cost之间的平衡</strong>：</p>
+<ul>
+<li>cache benefit：一次cache hit所能节省的storage I/O<ul>
+<li>Key存在的level越深，能够节省的storage I/O越多</li>
+</ul>
+</li>
+<li>cache cost：Cache entry占用的cache space</li>
+</ul>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><h3 id="caching-efficiency-factor"><a href="#caching-efficiency-factor" class="headerlink" title="caching efficiency factor"></a>caching efficiency factor</h3><p>为了权衡cache benefit与cache cost，本文设计了一个<strong>caching efficiency factor：</strong></p>
+<p><img src="/2020/12/22/AC-Key/E.png" alt></p>
+<p>定义为benefit与cost的比值，即 节省的I/O与所占的cache space之间的比值。</p>
+<p>根据这个factor E，本文改进了：</p>
+<ul>
+<li>LRU → E-LRU: 选择最近最少使用的<strong>a</strong>个条目，从中剔除<strong>E</strong>值最小的条目</li>
+<li>ARC → E-ARC：根据E来确定动态boundary移动的距离</li>
+</ul>
+<h4 id="Saved-storage-I-O–b"><a href="#Saved-storage-I-O–b" class="headerlink" title="Saved storage I/O–b"></a>Saved storage I/O–b</h4><ol>
+<li>b的计算方式：</li>
+</ol>
+<p><img src="/2020/12/22/AC-Key/b.png" alt></p>
+<ul>
+<li>对于block cache来说，因为一个block是最基本的I/O单元，因此若发现下一个要读取的block已经在cache中了，则该次I/O被节省，因此$b=1$</li>
+<li>对于KV cache来说，因为可以直接在cache中匹配所要查找的key，若命中了，则在storage中查找该key的所有I/O都可以被节省，此时b被定义为一个m相关的函数，m为查找该key要经过的SSTable的数量。</li>
+<li>对于KP cache来说，cache命中时仍要比KV cache多一次I/O，因此可节省的I/O要比KV cache少1。</li>
+</ul>
+<ol start="2">
+<li>m的计算方式：</li>
+</ol>
+<p><img src="/2020/12/22/AC-Key/m.png" alt></p>
+<ul>
+<li>假设Storage中$L_0$的的SSTable数量为$n_0$，则：<ul>
+<li>当要查找的key存在于$L_0$时，需要一个一个遍历$L_0$中的SSTable直到找到key，因此平均下来$m=n_0/2$</li>
+<li>当要查找的key存在于其它level时，需要首先遍历$L_0$中的所有SSTable，即$n_0$次I/O，再往下查找每个level中存放有key范围的特殊文件，因此是$l$次I/O，所以$m=l+n_0$</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li><p>$f(m)$<br> $f(m)$取决于KV store的实现，不过在通常情况下：</p>
+<ul>
+<li><p>$f(m) = m+2$</p>
+<p>因为查找一个KV对首先要读出m个BF block(布隆过滤器)来找到key所在的SSTable，再读出1个index block来找到key所在的data block，最后再将data block读出来找到对应的key value。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="AC-Key-Caching-components"><a href="#AC-Key-Caching-components" class="headerlink" title="AC-Key Caching components"></a>AC-Key Caching components</h3><p><img src="/2020/12/22/AC-Key/component.png" alt></p>
+<ol>
+<li>总体框架：</li>
+</ol>
+<ul>
+<li>AC Key将block、KV以及KP整合进cache中，并使用E-ARC算法动态调整大小。</li>
+</ul>
+<ol start="2">
+<li>Block cache</li>
+</ol>
+<ul>
+<li>包含data block、 BF block以及index block</li>
+</ul>
+<ol start="3">
+<li>KV cache and KP cache</li>
+</ol>
+<ul>
+<li>若有新的key需要加入cache，则首先加入到KP cache中，此key被定义为warm key。</li>
+<li>当KP cache中的key命中时，该key升级为hot key，经过1次storage I/O取出value后将KV对保存到KV cache中。</li>
+<li>保存到KV cache中的hot key无法回退为warm key，因其pointer信息已经丢失。</li>
+</ul>
+<h3 id="Flush-amp-Compaction-Handling"><a href="#Flush-amp-Compaction-Handling" class="headerlink" title="Flush &amp; Compaction Handling"></a>Flush &amp; Compaction Handling</h3><p>由于LSM Tree的flush操作和compaction操作会影响到cache的有效性，所以还需要做相应的处理。<br>（处理read请求时，KV store首先会在MemTable中查找，未查找到的才会在cache中查找）</p>
+<ol>
+<li>flush handling</li>
+</ol>
+<ul>
+<li>在进行flush时，根据MemTable中的内容在KV cache和KP cache中匹配对应的key并更新。</li>
+<li>由于flush时只会在storage中产生新的块，不会影响到旧的块，因此block cache无需更新。</li>
+</ul>
+<ol start="2">
+<li>compaction handling</li>
+</ol>
+<ul>
+<li>compaction会影响KP cache和block cache，但不会影响KV cache。</li>
+<li>对于KP cache来说，只需要将对应的指针更新为compaction后的新地址。</li>
+<li>对于block cache来说，需要移除失效的block，并以key范围与之有最大重叠的新block代替。</li>
+</ul>
+<h3 id="HAC-Hierarchical-Adaptive-Caching"><a href="#HAC-Hierarchical-Adaptive-Caching" class="headerlink" title="HAC: Hierarchical Adaptive Caching"></a>HAC: Hierarchical Adaptive Caching</h3><p><img src="/2020/12/22/AC-Key/hac.png" alt></p>
+<ol>
+<li>分层的自适应cache总体架构：</li>
+</ol>
+<ul>
+<li>上层分为point cache和block cache，对其应用E-ARC算法动态调整大小。</li>
+<li>下层point cache内部分为KV cache和KP cache，对其应用E-ARC算法动态调整大小。</li>
+</ul>
+<ol start="2">
+<li>boundary移动规则：</li>
+</ol>
+<ul>
+<li>当KV ghost cache或KP ghost cache命中时，都会导致point cache的size增大，而只有当增大的size达到了一个block的size时，point cache与block cache之间的boundary才会真正向block cache侧移动。</li>
+<li>当block ghost cache命中时，会导致point cache的size减小，此时KV cache以及KP cache按照他们size的比例对应减小。</li>
+</ul>
+<ol start="3">
+<li>boundary移动距离：<br> $d=kE=k{b/s}$</li>
+</ol>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><h3 id="AC-Key的自适应过程展示"><a href="#AC-Key的自适应过程展示" class="headerlink" title="AC Key的自适应过程展示"></a>AC Key的自适应过程展示</h3><ol>
+<li><p>offline介绍：<br><img src="/2020/12/22/AC-Key/offline.png" alt></p>
+<p> offline是指，在无法动态调整三种cache的size大小的情况下，手动设置KP cache所占比例以及block cache所占的比例进行测试，选择测试结果最优的配置作为最终的固定配置进行实验。</p>
+</li>
+</ol>
+<p><img src="/2020/12/22/AC-Key/adaptive.png" alt></p>
+<ul>
+<li>横坐标0-1为range query，可以看到此时全为block cache</li>
+<li>横坐标1-3为point cache，block cache急剧减少至0，KV cache和KP cache不断上升并动态调整至平衡。</li>
+<li>可以看到AC-Key与offline相比，读性能相近甚至更优。</li>
+</ul>
+<h3 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h3><ul>
+<li>rocksdb相当于pure block</li>
+</ul>
+<ol>
+<li>varying cache size<br><img src="/2020/12/22/AC-Key/cache_size.png" alt></li>
+<li>varying value size<br><img src="/2020/12/22/AC-Key/value_size.png" alt></li>
+<li>varying hot key ration and range query ratio<br><img src="/2020/12/22/AC-Key/hot_ratio.png" alt></li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>AC-Key是一种使用cache来提升基于LSM Tree的KV store读性能的设计，在cache中整合了block cache、KV cache以及KP cache来适应不同类型的读请求，并且运用了一种改进的ARC算法动态调整cache大小来提高cache的空间利用率。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/cache-LSM-Tree/" rel="tag"><i class="fa fa-tag"></i> cache, LSM-Tree</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/25/luxun-huagaiji/" rel="next" title="读《华盖集》">
+                <i class="fa fa-chevron-left"></i> 读《华盖集》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/01/26/netbeans配置/" rel="prev" title="netbeans配置">
+                netbeans配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AC-Key-Adaptive-Caching-for-LSM-based-Key-Value-Stores"><span class="nav-number">1.</span> <span class="nav-text">AC-Key: Adaptive Caching for LSM-based Key-Value Stores</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#key-word"><span class="nav-number">1.1.</span> <span class="nav-text">key word</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#background"><span class="nav-number">1.2.</span> <span class="nav-text">background</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LSM-Tree"><span class="nav-number">1.2.1.</span> <span class="nav-text">LSM Tree</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARC"><span class="nav-number">1.2.2.</span> <span class="nav-text">ARC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSM-–-read"><span class="nav-number">1.2.3.</span> <span class="nav-text">LSM – read</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Challenge"><span class="nav-number">1.3.</span> <span class="nav-text">Challenge</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-item-type"><span class="nav-number">1.3.1.</span> <span class="nav-text">Cache item type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cache-efficiency"><span class="nav-number">1.3.2.</span> <span class="nav-text">cache efficiency</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Design"><span class="nav-number">1.4.</span> <span class="nav-text">Design</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#caching-efficiency-factor"><span class="nav-number">1.4.1.</span> <span class="nav-text">caching efficiency factor</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Saved-storage-I-O–b"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">Saved storage I/O–b</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AC-Key-Caching-components"><span class="nav-number">1.4.2.</span> <span class="nav-text">AC-Key Caching components</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Flush-amp-Compaction-Handling"><span class="nav-number">1.4.3.</span> <span class="nav-text">Flush &amp; Compaction Handling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HAC-Hierarchical-Adaptive-Caching"><span class="nav-number">1.4.4.</span> <span class="nav-text">HAC: Hierarchical Adaptive Caching</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evaluation"><span class="nav-number">1.5.</span> <span class="nav-text">Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AC-Key的自适应过程展示"><span class="nav-number">1.5.1.</span> <span class="nav-text">AC Key的自适应过程展示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能对比"><span class="nav-number">1.5.2.</span> <span class="nav-text">性能对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>

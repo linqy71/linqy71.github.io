@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="service placement; Edge;,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="service-placement相关文章 无头苍蝇似的在各种顶会上寻找研究方向，在浏览了许多论文之后总觉得杂乱无章，收获甚少。终于发现一个较为感兴趣的方向，即service placement 服务放置问题。对这个问题甚是陌生，希望能从找到的这些文章中整理出一些思路。  顶会论文简介   论文 类型 研究内容     1 算法类 service placement + request sched">
+<meta name="keywords" content="service placement; Edge;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="service-placement相关文章">
+<meta property="og:url" content="linqy71.github.io/2020/06/08/service-placement相关文章/index.html">
+<meta property="og:site_name" content="曲率飞行">
+<meta property="og:description" content="service-placement相关文章 无头苍蝇似的在各种顶会上寻找研究方向，在浏览了许多论文之后总觉得杂乱无章，收获甚少。终于发现一个较为感兴趣的方向，即service placement 服务放置问题。对这个问题甚是陌生，希望能从找到的这些文章中整理出一些思路。  顶会论文简介   论文 类型 研究内容     1 算法类 service placement + request sched">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-03-25T16:54:52.186Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="service-placement相关文章">
+<meta name="twitter:description" content="service-placement相关文章 无头苍蝇似的在各种顶会上寻找研究方向，在浏览了许多论文之后总觉得杂乱无章，收获甚少。终于发现一个较为感兴趣的方向，即service placement 服务放置问题。对这个问题甚是陌生，希望能从找到的这些文章中整理出一些思路。  顶会论文简介   论文 类型 研究内容     1 算法类 service placement + request sched">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2020/06/08/service-placement相关文章/">
+
+
+
+
+
+  <title>service-placement相关文章 | 曲率飞行</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曲率飞行</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/06/08/service-placement相关文章/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曲率飞行">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">service-placement相关文章</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-08T15:54:11+08:00">
+                2020-06-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,498
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  16
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="service-placement相关文章"><a href="#service-placement相关文章" class="headerlink" title="service-placement相关文章"></a>service-placement相关文章</h1><blockquote>
+<p>无头苍蝇似的在各种顶会上寻找研究方向，在浏览了许多论文之后总觉得杂乱无章，收获甚少。终于发现一个较为感兴趣的方向，即service placement 服务放置问题。对这个问题甚是陌生，希望能从找到的这些文章中整理出一些思路。</p>
+</blockquote>
+<h2 id="顶会论文简介"><a href="#顶会论文简介" class="headerlink" title="顶会论文简介"></a>顶会论文简介</h2><table>
+<thead>
+<tr>
+<th>论文</th>
+<th>类型</th>
+<th>研究内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>算法类</td>
+<td>service placement + request scheduling</td>
+</tr>
+<tr>
+<td>2</td>
+<td>算法类</td>
+<td>service placement + request routing</td>
+</tr>
+<tr>
+<td>3</td>
+<td>算法类</td>
+<td>service placement ， user mobility</td>
+</tr>
+<tr>
+<td>4</td>
+<td>算法类</td>
+<td>VNF placement ， budget &amp; capacity constraint</td>
+</tr>
+<tr>
+<td>5</td>
+<td>算法类</td>
+<td>ML job placement ，interference</td>
+</tr>
+<tr>
+<td>6</td>
+<td>算法类</td>
+<td>SFC placement ，throughput</td>
+</tr>
+<tr>
+<td>7</td>
+<td>算法类</td>
+<td>DAG placement</td>
+</tr>
+<tr>
+<td>8</td>
+<td>算法类</td>
+<td>application component placement</td>
+</tr>
+</tbody>
+</table>
+<h3 id="INFOCOM2019"><a href="#INFOCOM2019" class="headerlink" title="INFOCOM2019"></a>INFOCOM2019</h3><h4 id="1-Service-Placement-and-Request-Scheduling-for-Data-intensive-Applications-in-Edge-Clouds"><a href="#1-Service-Placement-and-Request-Scheduling-for-Data-intensive-Applications-in-Edge-Clouds" class="headerlink" title="1. Service Placement and Request Scheduling for Data-intensive Applications in Edge Clouds"></a>1. Service Placement and Request Scheduling for Data-intensive Applications in Edge Clouds</h4><h5 id="作者"><a href="#作者" class="headerlink" title="作者"></a>作者</h5><p>Vajiheh Farhadi, Fidan Mehmeti, Ting He, Tom La Porta, Hana Khamfroush, Shiqiang Wang, Kevin S Chan </p>
+<p>Pennsylvania State University, University of Kentucky, IBM, ARL </p>
+<h5 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h5><p>移动边缘计算使无线用户可以利用云计算的功能而不会造成较大的通信延迟。为了从边缘服务于数据密集型应用程序（例如增强现实，视频分析），除了需要CPU周期和用于计算的内存外，我们还需要<strong>用于存储服务器数据的存储资源和用于接收用户提供的数据的网络带宽</strong>。此外，在考虑系统稳定性和运营成本的同时，需要<strong>随时间调整数据放置以适应随时间变化的需求</strong>。我们通过提出一个两阶段规模的框架来解决此问题，该框架在存储，通信，计算和预算约束下共同优化服务（数据和代码）放置和请求调度。通过分析各种情况的难度，我们可以充分说明问题的复杂性。通过将问题转化为集合函数优化，我们开发了多项式时间算法，该算法在某些条件下可实现恒定因子近似。大量的综合和跟踪驱动的仿真表明，该算法可实现90％的最佳性能。</p>
+<h5 id="一些概念"><a href="#一些概念" class="headerlink" title="一些概念"></a>一些概念</h5><ul>
+<li>shared resource pool 共享资源池：<br> 服务迁移需要考虑service performance和migration cost之间的平衡。当某些边缘节点负载较重时，考虑使用非离用户最近的边缘节点。因此，标准化的开放式边缘计算环境应运而生，使同一地理环境内的边缘云形成一个共享资源池。</li>
+<li><p>request scheduling 请求调度：<br>  探究用户请求应调度到哪个服务器上以使得一些参数（例如 cost、completion time）最优的问题。<br>  它决定是否/在何处调度每个请求，考虑通信、边缘云的计算能力以及其他限制。</p>
+</li>
+<li><p>service placement 服务放置：<br>  它决定如何在每个边缘云的存储容量内复制和放置每个服务（包括服务器代码和数据）</p>
+</li>
+</ul>
+<h5 id="本文工作"><a href="#本文工作" class="headerlink" title="本文工作"></a>本文工作</h5><p>我们共同考虑数据密集型应用程序的服务放置和请求调度。 与[20]相比，我们将两个决策的时间尺度分开：<strong>服务放置发生在较大的范围（frames）以防止系统不稳定，而请求调度发生在较小的尺度（slots）以支持实时服务</strong>。 由于服务复制/迁移，我们还施加了预算约束来控制运营成本。 这些更改可在重新配置的成本和服务请求的性能之间实现可控的权衡，同时在根本的优化问题中引发关键的更改。</p>
+<h4 id="2-Joint-Service-Placement-and-Request-Routing-in-Multi-cell-Mobile-Edge-Computing-Networks"><a href="#2-Joint-Service-Placement-and-Request-Routing-in-Multi-cell-Mobile-Edge-Computing-Networks" class="headerlink" title="2. Joint Service Placement and Request Routing in Multi-cell Mobile Edge Computing Networks"></a>2. Joint Service Placement and Request Routing in Multi-cell Mobile Edge Computing Networks</h4><h5 id="作者-1"><a href="#作者-1" class="headerlink" title="作者"></a>作者</h5><p>Konstantinos Poularakis, Jaime Llorca, Antonia M. Tulino, Ian Taylor, and Leandros Tassiulas </p>
+<p>Department of Electrical Engineering and Institute for Network Science, Yale University, USA<br>Nokia Bell Labs, USA<br>Department of Electrical Engineering and Information Technologies, University of Naples Federico II, Italy<br>School of Computer Science and Informatics, Cardiff University, UK</p>
+<h5 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h5><p>诸如增强现实，网络游戏和自动驾驶等创新移动服务的激增，刺激了人们对低延迟访问计算资源的需求日益增长，而这些延迟只能通过现有的集中式云系统无法满足。通过支持在最终用户附近的网络外围执行计算任务，移动边缘计算（MEC）有望成为满足低延迟服务需求的有效解决方案。尽管许多最新研究已经解决了确定服务任务的执行以及将用户请求路由到相应边缘服务器的问题，但重点主要放在高效利用计算资源上，而忽略了这样一个事实：<strong>需要存储数据以启用服务执行，并且许多新兴服务表现出不对称的带宽要求</strong>。为了填补这一空白，我们研究了在具有多维（存储-计算-通信）约束的支持MEC的mmulti-cell网络中，服务放置和请求路由的联合优化。我们表明，该问题概括了文献中的几个问题，并提出了一种使用随机舍入实现接近最佳性能的算法。评估结果表明，我们的方法可以有效利用可用资源，以最大程度地减少低延迟边缘云服务器所服务的请求数量。</p>
+<h5 id="一些概念-1"><a href="#一些概念-1" class="headerlink" title="一些概念"></a>一些概念</h5><ul>
+<li>面对的挑战：<ul>
+<li>allocation of computation resources</li>
+<li>non-trival amout of data to be prestored at BS</li>
+<li>communication requirements of services<br>(不对称的双向通信，占用无线基站上行链路和下行链路带宽容量的不同部分)</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-Adaptive-User-managed-Service-Placement-for-Mobile-Edge-Computing-An-Online-Learning-Approach"><a href="#3-Adaptive-User-managed-Service-Placement-for-Mobile-Edge-Computing-An-Online-Learning-Approach" class="headerlink" title="3. Adaptive User-managed Service Placement for Mobile Edge Computing: An Online Learning Approach"></a>3. Adaptive User-managed Service Placement for Mobile Edge Computing: An Online Learning Approach</h4><h5 id="作者-2"><a href="#作者-2" class="headerlink" title="作者"></a>作者</h5><p>Tao Ouyang, Rui Li, Xu Chen, Zhi Zhou, Xin Tang </p>
+<p>School of Data and Computer Science, Sun Yat-sen University, Guangzhou, China</p>
+<h5 id="摘要-2"><a href="#摘要-2" class="headerlink" title="摘要"></a>摘要</h5><p>设想为云扩展的移动边缘计算（MEC）将云资源从网络核心推送到网络边缘，从而满足许多新兴的计算密集型移动应用程序的严格服务要求。现有的许多工作都集中在研究系统范围内的MEC服务放置问题，个性化服务性能优化而受到的关注较少。因此，在本文中，我们提出了一种新颖的<strong>自适应用户管理</strong>的服务放置机制，该机制可以<strong>联合优化用户的感知潜伏期和服务迁移成本，并通过用户偏好进行加权</strong>。为了克服未来信息的不可用和未知的系统动力学问题，我们将动态服务放置问题公式化为a contextual multiarmed bandit (MAB) 问题，然后提出一种基于汤普森采样的在线学习算法来探索动态MEC环境，进一步协助用户做出自适应服务放置决策。严格的理论分析和广泛的评估证明了所提出的自适应用户管理的服务放置机制的优越性能。</p>
+<h4 id="4-Joint-Placement-and-Allocation-of-Virtual-Network-Functions-with-Budget-and-Capacity-Constraints"><a href="#4-Joint-Placement-and-Allocation-of-Virtual-Network-Functions-with-Budget-and-Capacity-Constraints" class="headerlink" title="4. Joint Placement and Allocation of Virtual Network Functions with Budget and Capacity Constraints"></a>4. Joint Placement and Allocation of Virtual Network Functions with Budget and Capacity Constraints</h4><h5 id="作者-3"><a href="#作者-3" class="headerlink" title="作者"></a>作者</h5><p>Gamal Sallam and Bo Ji </p>
+<p>Department of Computer and Information Sciences, Temple University, Philadelphia, PA, U</p>
+<h5 id="摘要-3"><a href="#摘要-3" class="headerlink" title="摘要"></a>摘要</h5><p>随着网络功能虚拟化（NFV）的出现，传统上可以在专用硬件上运行的网络服务现在可以使用托管在通用商品硬件上的虚拟网络功能（VNF）来实现。这种新的网络范例为网络服务提供商（ISP）提供了极大的灵活性，可以有效地操作其网络（收集网络统计信息，执行管理策略等）。但是，引入NFV要求进行投资以将VNF部署在某些网络节点（称为VNF节点）上，这必须考虑实际的限制，例如部署预算和VNF节点容量。为此，重要的是设计一个<strong>联合的VNF节点放置和容量分配算法，该算法可以在尊重此类实际约束的同时，最大化VNF节点完全处理的网络流量总量</strong>。与通常忽略预算约束或能力约束的大多数先前工作相反，我们明确考虑了两者。我们证明，考虑这些约束会带来一些新的挑战。具体而言，我们证明了所研究的问题不仅是NP难的，而且是非亚模的。为了解决这些挑战，我们引入了一种新颖的松弛方法，以使松弛放置子问题的目标函数变为亚模。利用这种有用的子模性质，我们提出了两种算法，它们分别对原始的非松弛问题实现了1/2（1-1 / e）和1/3（1-1 / e）的近似比。最后，我们使用跟踪驱动的仿真和基于综合网络设置的仿真，通过广泛的评估来证实所提出算法的有效性。</p>
+<h4 id="5-Deep-Learning-based-Job-Placement-in-Distributed-Machine-Learning-Clusters"><a href="#5-Deep-Learning-based-Job-Placement-in-Distributed-Machine-Learning-Clusters" class="headerlink" title="5. Deep Learning-based Job Placement in Distributed Machine Learning Clusters"></a>5. Deep Learning-based Job Placement in Distributed Machine Learning Clusters</h4><h5 id="作者-4"><a href="#作者-4" class="headerlink" title="作者"></a>作者</h5><p>Yixin Bao, Yanghua Peng, Chuan Wu </p>
+<p>Department of Computer Science, The University of Hong Kong</p>
+<h5 id="摘要-4"><a href="#摘要-4" class="headerlink" title="摘要"></a>摘要</h5><p>生产机器学习（ML）集群通常托管各种分布式ML工作负载，例如语音识别，机器翻译。虽然作业之间的服务器共享可以提高资源利用率，但是位于同一地点的ML作业之间的干扰会导致性能严重下降。现有的群集调度程序（例如，Mesos）在其工作位置上是无干扰的，从而导致资源效率不佳。文献中已经研究了具有干扰意识的工作位置，但是使用详细的工作量分析和干扰建模进行了处理，这不是一般的解决方案。本文介绍了Harmony，这是一种深度学习驱动的ML群集调度程序，它<strong>以最小化干扰和最大化性能（即训练完成时间）的方式放置训练作业</strong>。Harmony基于精心设计的深度强化学习（DRL）框架，并补充了奖励建模。 DRL采用最先进的技术来稳定训练并提高收敛性，其中包括演员批评算法，作业意识动作空间探索和体验重播。鉴于通常缺乏对应于不同安置决策的奖励样本，我们建立了一个辅助奖励预测模型，该模型使用历史样本进行训练，并用于为看不见的安置产生奖励。在由6个GPU服务器组成的Kubernetes集群中使用实际ML工作负载进行的实验表明，就平均作业完成时间而言，Harmony的性能比典型的调度程序高25％。</p>
+<h5 id="一些概念-2"><a href="#一些概念-2" class="headerlink" title="一些概念"></a>一些概念</h5><ul>
+<li>本文所描述的interference：<br>创建在同一server上的不同类型的ML jobs，例如CPU-intensive, I/O intensive, network bandwith-intensive, 由于底层资源的共享而导致的干扰。</li>
+</ul>
+<h4 id="6-Octans-Optimal-Placement-of-Service-Function-Chains-in-Many-Core-Systems"><a href="#6-Octans-Optimal-Placement-of-Service-Function-Chains-in-Many-Core-Systems" class="headerlink" title="6. Octans: Optimal Placement of Service Function Chains in Many-Core Systems"></a>6. Octans: Optimal Placement of Service Function Chains in Many-Core Systems</h4><h5 id="作者-5"><a href="#作者-5" class="headerlink" title="作者"></a>作者</h5><p>Zhilong Zheng, Jun Bi, Heng Yu, Haiping Wang, Chen Sun, Hongxin Hu, Jianping Wu</p>
+<p>Institute for Network Sciences and Cyberspace, Tsinghua University<br>Department of Computer Science, Tsinghua University<br>Beijing National Research Center for Information Science and Technology<br>School of Computing, Clemson University</p>
+<h5 id="摘要-5"><a href="#摘要-5" class="headerlink" title="摘要"></a>摘要</h5><p>网络功能虚拟化（NFV）可以通过在具有多个核心的商用服务器上运行服务功能链（SFC），来提供服务交付灵活性并降低总体成本。用于将SFC放置在一台服务器中的现有解决方案将所有CPU内核视为相等，并将隔离的CPU内核分配给不同的网络功能（NF）。但是，高级服务器通常采用非统一内存访问（NUMA）架构来提高多核系统的可伸缩性。 CPU内核分为多个节点，由于<strong>跨节点内存访问和节点内资源争用而导致性能瓶颈</strong>。我们的评估表明，与最佳放置解决方案相比，随机选择将NF放置在SFC中的核心可能会降低39.2％的吞吐量。在本文中，我们提出了Octan，它是NFV协调器，可在多核系统中实现所有SFC的最大总吞吐量。 Octans首先将优化问题表述为非线性整数规划（NLIP）模型。然后，我们确定解决问题的关键因素是评估同一SFC或不同SFC中其他NF导致的NF吞吐量下降，即性能下降指数，并基于系统级性能指标提出正式而精确的预测模型。最后，我们提出了一种有效的启发式算法来快速找到接近最佳的放置解决方案。我们已经实现了Octans的原型。广泛的评估表明，与两种最先进的放置机制相比，Octan显着提高了总吞吐量26.7％〜51.8％，SFC性能的预测误差非常低（平均偏差为2.6％）。而且，Octans可以快速找到具有最佳间隙（1.2％〜3.5％）的接近最佳的放置解决方案。</p>
+<h5 id="一些概念-3"><a href="#一些概念-3" class="headerlink" title="一些概念"></a>一些概念</h5><ul>
+<li>NFV 网络功能虚拟化：对传统在专有硬件上运行的网络服务（例如路由器、防火墙和负载平衡器）进行虚拟化的方法。这些服务被打包为商用硬件上的虚拟机（VM），这样服务提供商便可以在标准服务器（而非专有服务器）上运行其网络。</li>
+<li>SFC 服务功能链：网络包以network functions sequence的形式被处理，从而形成SFC。</li>
+</ul>
+<h5 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h5><p>现有解决方案将所有CPU内核视为相等，将隔离的CPU内核分配给不同的网络功能。</p>
+<ul>
+<li>随机选择支持SFC的CPU内核可能会严重损害吞吐量：（一个节点由多个CPU cores组成）<ul>
+<li>跨节点内存访问引起的吞吐量瓶颈</li>
+<li>节点内资源争用</li>
+</ul>
+</li>
+</ul>
+<h5 id="本文工作-1"><a href="#本文工作-1" class="headerlink" title="本文工作"></a>本文工作</h5><ul>
+<li>用非线性整数编程模型解决问题</li>
+<li>为了评估由于资源争用和链接而导致的性能下降指标，我们引入了一种正式的方法来查找性能指标，并提出了一种用于性能下降预测的准确模型。</li>
+</ul>
+<h3 id="SEC"><a href="#SEC" class="headerlink" title="SEC"></a>SEC</h3><h4 id="7-Linearize-Predict-and-Place-Minimizing-the-Makespan-for-Edge-based-Stream-Processing-of-Directed-Acyclic-Graphs-（2019）"><a href="#7-Linearize-Predict-and-Place-Minimizing-the-Makespan-for-Edge-based-Stream-Processing-of-Directed-Acyclic-Graphs-（2019）" class="headerlink" title="7. Linearize, Predict and Place: Minimizing the Makespan for Edge-based Stream Processing of Directed Acyclic Graphs （2019）"></a>7. Linearize, Predict and Place: Minimizing the Makespan for Edge-based Stream Processing of Directed Acyclic Graphs （2019）</h4><h5 id="作者-6"><a href="#作者-6" class="headerlink" title="作者"></a>作者</h5><p>Shweta Khare, Hongyang Sun, Julien Gascon-Samson, Kaiwen Zhang, Aniruddha Gokhale, Yogesh Barve, Anirban Bhattacharjee, and Xenofon Koutsoukos.</p>
+<h5 id="摘要-6"><a href="#摘要-6" class="headerlink" title="摘要"></a>摘要</h5><p>在诸如智能电网之类的网络物理系统中发现的许多物联网应用，都必须对关键事件（例如供需不匹配）采取控制措施，这需要对流数据进行低延迟处理以进行快速事件检测和异常纠正。这些流应用程序通常采用有向非循环图（DAG）的形式，其中顶点表示运算符，边表示这些运算符之间的数据流。边缘计算由于能够在数据源附近提供低延迟处理的能力而作为一种很容易满足延迟关键的物联网应用程序需求的方法，最近引起了广泛的关注。为了获得边缘计算的好处，这些应用程序的组成运营商必须以一种合理的方式放置，通过<strong>权衡运营商之间的通信成本与由于运营商在同一资源受限的边缘上的同一地点而产生的干扰成本</strong>。为了解决这些挑战并大幅<strong>简化任意大小和拓扑的DAG的放置问题</strong>，我们提出了一种算法，该算法首先<strong>将任意流处理DAG转换为一组近似的线性链</strong>。随后，用于共处一地的线性链的数据驱动的等待时间预测模型用于通知操作员的位置，以使定义为DAG中所有路径的<strong>最大等待时间的延展时间最小化</strong>。我们使用Beagle Bone集群上代表边缘计算环境的各种DAG放置方案，通过经验评估我们的算法。</p>
+<p>(DAG placement)</p>
+<h4 id="8-Efficient-placement-of-multi-component-applications-in-edge-computing-systems-（2017）"><a href="#8-Efficient-placement-of-multi-component-applications-in-edge-computing-systems-（2017）" class="headerlink" title="8. Efficient placement of multi-component applications in edge computing systems （2017）"></a>8. Efficient placement of multi-component applications in edge computing systems （2017）</h4><h5 id="作者-7"><a href="#作者-7" class="headerlink" title="作者"></a>作者</h5><p>Tayebeh Bahreini and Daniel Grosu</p>
+<p>Dept. of Computer Science, Wayne State University</p>
+<h5 id="摘要-7"><a href="#摘要-7" class="headerlink" title="摘要"></a>摘要</h5><p>移动边缘计算（MEC）是一种新的范例，已被引入以解决移动云计算技术的低效率问题。 MEC背后的关键思想是通过将应用程序的计算转发到网络边缘而不是云数据中心来增强移动设备的功能。 MEC的主要挑战之一是确定移动应用程序组件在边缘服务器上的有效放置，从而最大程度地减少运行应用程序时产生的成本。在本文中，我们通过设计一种有效的启发式在线算法来解决边缘计算中的多组件应用程序放置问题。我们还提出了考虑到<strong>用户位置和网络功能的动态特性</strong>的多组件应用程序放置问题的混合整数线性规划公式。我们进行了广泛的实验，以评估该算法的性能。实验结果表明，该算法执行时间极短，并获得了最佳解。</p>
+<h5 id="一些概念-4"><a href="#一些概念-4" class="headerlink" title="一些概念"></a>一些概念</h5><ul>
+<li>challenging issues in MEC：用户移动性导致的应用组件放置问题</li>
+<li>application graphs: 节点表示应用组件</li>
+<li>application placement problem：可以视为两种图之间的映射问题</li>
+</ul>
+<h5 id="本文工作-2"><a href="#本文工作-2" class="headerlink" title="本文工作"></a>本文工作</h5><ul>
+<li>将多组件应用程序放置问题的onine版本公式化为混合整数线性程序（MILP）</li>
+<li>基于简单算法技术（例如匹配和局部搜索）的算法，并避免使用复杂的方法（例如基于马尔可夫决策过程的方法）</li>
+<li>算法设计的主要思想是确定应用程序组件与边缘/核心服务器之间的最佳匹配，而无需考虑组件之间的通信需求，然后考虑组件之间的通信需求并使用本地搜索过程改善解决方案</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>service placement问题是指考虑如何在每个边缘云的存储容量内复制和放置每个服务的问题。</p>
+</li>
+<li><p>挑战：</p>
+<ul>
+<li>通常考虑优化服务器在storage、computation、communication方面的资源限制，以及用户的移动性</li>
+<li>由于在同一资源受限的edge server上部署不同的service而导致的问题</li>
+</ul>
+</li>
+<li><p>最新研究</p>
+<ul>
+<li>与请求调度、网络功能虚拟化（NFV）结合进行研究</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/service-placement-Edge/" rel="tag"><i class="fa fa-tag"></i> service placement; Edge;</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/29/wechat-project-summary/" rel="next" title="微信小程序--入门与踩坑">
+                <i class="fa fa-chevron-left"></i> 微信小程序--入门与踩坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/15/Edge-Computing相关论文-1/" rel="prev" title="Edge-Computing相关论文-1">
+                Edge-Computing相关论文-1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#service-placement相关文章"><span class="nav-number">1.</span> <span class="nav-text">service-placement相关文章</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#顶会论文简介"><span class="nav-number">1.1.</span> <span class="nav-text">顶会论文简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#INFOCOM2019"><span class="nav-number">1.1.1.</span> <span class="nav-text">INFOCOM2019</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Service-Placement-and-Request-Scheduling-for-Data-intensive-Applications-in-Edge-Clouds"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1. Service Placement and Request Scheduling for Data-intensive Applications in Edge Clouds</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者"><span class="nav-number">1.1.1.1.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要"><span class="nav-number">1.1.1.1.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些概念"><span class="nav-number">1.1.1.1.3.</span> <span class="nav-text">一些概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#本文工作"><span class="nav-number">1.1.1.1.4.</span> <span class="nav-text">本文工作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Joint-Service-Placement-and-Request-Routing-in-Multi-cell-Mobile-Edge-Computing-Networks"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">2. Joint Service Placement and Request Routing in Multi-cell Mobile Edge Computing Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-1"><span class="nav-number">1.1.1.2.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-1"><span class="nav-number">1.1.1.2.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些概念-1"><span class="nav-number">1.1.1.2.3.</span> <span class="nav-text">一些概念</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Adaptive-User-managed-Service-Placement-for-Mobile-Edge-Computing-An-Online-Learning-Approach"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">3. Adaptive User-managed Service Placement for Mobile Edge Computing: An Online Learning Approach</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-2"><span class="nav-number">1.1.1.3.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-2"><span class="nav-number">1.1.1.3.2.</span> <span class="nav-text">摘要</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-Joint-Placement-and-Allocation-of-Virtual-Network-Functions-with-Budget-and-Capacity-Constraints"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">4. Joint Placement and Allocation of Virtual Network Functions with Budget and Capacity Constraints</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-3"><span class="nav-number">1.1.1.4.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-3"><span class="nav-number">1.1.1.4.2.</span> <span class="nav-text">摘要</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-Deep-Learning-based-Job-Placement-in-Distributed-Machine-Learning-Clusters"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">5. Deep Learning-based Job Placement in Distributed Machine Learning Clusters</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-4"><span class="nav-number">1.1.1.5.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-4"><span class="nav-number">1.1.1.5.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些概念-2"><span class="nav-number">1.1.1.5.3.</span> <span class="nav-text">一些概念</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-Octans-Optimal-Placement-of-Service-Function-Chains-in-Many-Core-Systems"><span class="nav-number">1.1.1.6.</span> <span class="nav-text">6. Octans: Optimal Placement of Service Function Chains in Many-Core Systems</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-5"><span class="nav-number">1.1.1.6.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-5"><span class="nav-number">1.1.1.6.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些概念-3"><span class="nav-number">1.1.1.6.3.</span> <span class="nav-text">一些概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#挑战"><span class="nav-number">1.1.1.6.4.</span> <span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#本文工作-1"><span class="nav-number">1.1.1.6.5.</span> <span class="nav-text">本文工作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SEC"><span class="nav-number">1.1.2.</span> <span class="nav-text">SEC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#7-Linearize-Predict-and-Place-Minimizing-the-Makespan-for-Edge-based-Stream-Processing-of-Directed-Acyclic-Graphs-（2019）"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">7. Linearize, Predict and Place: Minimizing the Makespan for Edge-based Stream Processing of Directed Acyclic Graphs （2019）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-6"><span class="nav-number">1.1.2.1.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-6"><span class="nav-number">1.1.2.1.2.</span> <span class="nav-text">摘要</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-Efficient-placement-of-multi-component-applications-in-edge-computing-systems-（2017）"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">8. Efficient placement of multi-component applications in edge computing systems （2017）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#作者-7"><span class="nav-number">1.1.2.2.1.</span> <span class="nav-text">作者</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#摘要-7"><span class="nav-number">1.1.2.2.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#一些概念-4"><span class="nav-number">1.1.2.2.3.</span> <span class="nav-text">一些概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#本文工作-2"><span class="nav-number">1.1.2.2.4.</span> <span class="nav-text">本文工作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
