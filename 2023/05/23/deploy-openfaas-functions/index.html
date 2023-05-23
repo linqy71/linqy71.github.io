@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="k8s openfaas tf-serving,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基于k8s部署openfaas,并启动tensorflow-serving函数作为服务响应请求  部署k8s用kubeadm部署k8s并检测GPU 上一篇博客记录了部署过程，在其基础上进行下一步。 部署openfaas参考openfaas部署 12345678910111213141516171819202122#安装client$ curl -Lo faas-cli https://githu">
+<meta name="keywords" content="k8s openfaas tf-serving">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k8s+openfaas运行自定义函数--tfserving prediction">
+<meta property="og:url" content="linqy71.github.io/2023/05/23/deploy-openfaas-functions/index.html">
+<meta property="og:site_name" content="曲率飞行">
+<meta property="og:description" content="基于k8s部署openfaas,并启动tensorflow-serving函数作为服务响应请求  部署k8s用kubeadm部署k8s并检测GPU 上一篇博客记录了部署过程，在其基础上进行下一步。 部署openfaas参考openfaas部署 12345678910111213141516171819202122#安装client$ curl -Lo faas-cli https://githu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-05-23T08:09:02.457Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="k8s+openfaas运行自定义函数--tfserving prediction">
+<meta name="twitter:description" content="基于k8s部署openfaas,并启动tensorflow-serving函数作为服务响应请求  部署k8s用kubeadm部署k8s并检测GPU 上一篇博客记录了部署过程，在其基础上进行下一步。 部署openfaas参考openfaas部署 12345678910111213141516171819202122#安装client$ curl -Lo faas-cli https://githu">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2023/05/23/deploy-openfaas-functions/">
+
+
+
+
+
+  <title>k8s+openfaas运行自定义函数--tfserving prediction | 曲率飞行</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">曲率飞行</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2023/05/23/deploy-openfaas-functions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="曲率飞行">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">k8s+openfaas运行自定义函数--tfserving prediction</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-05-23T14:59:12+08:00">
+                2023-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/操作记录/" itemprop="url" rel="index">
+                    <span itemprop="name">操作记录</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,519
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>基于k8s部署openfaas,并启动tensorflow-serving函数作为服务响应请求</p>
+</blockquote>
+<h1 id="部署k8s"><a href="#部署k8s" class="headerlink" title="部署k8s"></a>部署k8s</h1><p><a href="https://linqy71.github.io/2023/03/26/deploy-k8s-with-kubeadm/">用kubeadm部署k8s并检测GPU</a></p>
+<p>上一篇博客记录了部署过程，在其基础上进行下一步。</p>
+<h1 id="部署openfaas"><a href="#部署openfaas" class="headerlink" title="部署openfaas"></a>部署openfaas</h1><p>参考<a href="https://coldtea214.gitbook.io/cncf-serverless/installableplatform/openfaas" target="_blank" rel="noopener">openfaas部署</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#安装client</span><br><span class="line">$ curl -Lo faas-cli https://github.com/openfaas/faas-cli/releases/download/0.12.8/faas-cli \</span><br><span class="line">    &amp;&amp; chmod +x faas-cli &amp;&amp; sudo mv faas-cli /usr/local/bin/</span><br><span class="line"></span><br><span class="line">#安装server</span><br><span class="line">$ cd faas-netes  #进入faas-netes 仓库</span><br><span class="line">$ kubectl apply -f namespaces.yml  #创建2个namespace</span><br><span class="line">$ kubectl -n openfaas create secret generic basic-auth \</span><br><span class="line">    --from-literal=basic-auth-user=admin \</span><br><span class="line">    --from-literal=basic-auth-password=&quot;admin&quot;</span><br><span class="line">$ kubectl apply -f ./yaml/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#确认所有组件正常运行</span><br><span class="line">$ kubectl get pods -n openfaas</span><br><span class="line"></span><br><span class="line">NAME                            READY   STATUS    RESTARTS        AGE</span><br><span class="line">alertmanager-67f5ff98d4-lpr5f   1/1     Running   0               2d21h</span><br><span class="line">gateway-6f47b5c9b4-5szwn        2/2     Running   1 (2d21h ago)   2d21h</span><br><span class="line">nats-85dc667985-drw9x           1/1     Running   0               2d21h</span><br><span class="line">prometheus-6b76879cd6-x5z7m     1/1     Running   0               2d21h</span><br><span class="line">queue-worker-648c8c8c6f-vvj6x   1/1     Running   0               2d21h</span><br></pre></td></tr></table></figure>
+<p>成功运行后可继续参考<a href="https://coldtea214.gitbook.io/cncf-serverless/installableplatform/openfaas" target="_blank" rel="noopener">openfaas部署</a>写一个基础go函数或参考<a href="https://docs.openfaas.com/tutorials/first-python-function/" target="_blank" rel="noopener">First Python Function</a>写一个基础python函数</p>
+<h1 id="编写函数模板"><a href="#编写函数模板" class="headerlink" title="编写函数模板"></a>编写函数模板</h1><p>由于faas-cli提供的模板库有限，需要自行编写运行tfserving镜像的模板。</p>
+<ol>
+<li><p>仿照python模板，创建tfserving模板文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── template</span><br><span class="line">│   ├── python</span><br><span class="line">│   │   ├── Dockerfile</span><br><span class="line">│   │   ├── function</span><br><span class="line">│   │   ├── index.py</span><br><span class="line">│   │   ├── requirements.txt</span><br><span class="line">│   │   └── template.yml</span><br><span class="line">│   └── tfserving</span><br><span class="line">│       ├── Dockerfile</span><br><span class="line">│       ├── entrypoint.sh</span><br><span class="line">│       ├── function</span><br><span class="line">│       ├── index.py</span><br><span class="line">│       ├── requirements.txt</span><br><span class="line">│       ├── serving_models</span><br><span class="line">│       └── template.yml</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>template/tfserving/Dockerfile内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">FROM --platform=$&#123;TARGETPLATFORM:-linux/amd64&#125; ghcr.io/openfaas/of-watchdog:0.9.10 as watchdog</span><br><span class="line">FROM --platform=$&#123;TARGETPLATFORM:-linux/amd64&#125; tensorflow/serving:latest</span><br><span class="line"></span><br><span class="line">COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog</span><br><span class="line">RUN chmod +x /usr/bin/fwatchdog</span><br><span class="line"></span><br><span class="line">###安装python3###</span><br><span class="line">RUN apt-get -qy update</span><br><span class="line">RUN apt-get install -y libgl1-mesa-dev libglib2.0-dev wget</span><br><span class="line">RUN yes | apt-get install python3  python3-pip</span><br><span class="line">RUN ln -s /usr/bin/python3 /usr/bin/python</span><br><span class="line">###安装python3###</span><br><span class="line"></span><br><span class="line"># Add non root user</span><br><span class="line">RUN addgroup --system app &amp;&amp; adduser app --system --ingroup app</span><br><span class="line">RUN chown app /home/app</span><br><span class="line"></span><br><span class="line">USER app</span><br><span class="line"></span><br><span class="line">ENV PATH=$PATH:/home/app/.local/bin</span><br><span class="line"></span><br><span class="line">WORKDIR /home/app/</span><br><span class="line"></span><br><span class="line">COPY --chown=app:app index.py           .</span><br><span class="line">COPY --chown=app:app requirements.txt   .</span><br><span class="line"></span><br><span class="line">USER root</span><br><span class="line">RUN pip3 install --upgrade pip</span><br><span class="line">RUN pip3 install --no-cache-dir -r requirements.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple/</span><br><span class="line"></span><br><span class="line"># Build the function directory and install any user-specified components</span><br><span class="line">USER app</span><br><span class="line"></span><br><span class="line">RUN mkdir -p function</span><br><span class="line">RUN touch ./function/__init__.py</span><br><span class="line"></span><br><span class="line">USER root</span><br><span class="line">WORKDIR /home/app/function/</span><br><span class="line">COPY --chown=app:app function/requirements.txt  .</span><br><span class="line">RUN pip3 install --no-cache-dir --verbose -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/</span><br><span class="line"></span><br><span class="line">#下载一张图片作为模型的input</span><br><span class="line">RUN wget https://img-blog.csdnimg.cn/575dd33e3cc74ad7bd4ebed9d4f68362.png#pic_center</span><br><span class="line">RUN mv *.png test.png</span><br><span class="line">RUN cp ./test.png ../</span><br><span class="line"></span><br><span class="line">#install function code</span><br><span class="line">USER root</span><br><span class="line">COPY --chown=app:app function/   .</span><br><span class="line">ARG MODEL</span><br><span class="line"></span><br><span class="line"># FROM build as ship</span><br><span class="line">WORKDIR /home/app/</span><br><span class="line"></span><br><span class="line">###复制模型镜像###</span><br><span class="line">COPY ./serving_models/$MODEL /models/$MODEL</span><br><span class="line">ENV MODEL_NAME=$MODEL</span><br><span class="line">###复制模型镜像###</span><br><span class="line"></span><br><span class="line">###复制entrypoint脚本，启动tfserving的关键###</span><br><span class="line">COPY ./entrypoint.sh ./entrypoint.sh</span><br><span class="line">RUN chmod +x ./entrypoint.sh</span><br><span class="line">###复制entrypoint脚本###</span><br><span class="line"></span><br><span class="line">#configure WSGI server and healthcheck</span><br><span class="line"># USER app</span><br><span class="line">ENV fprocess=&quot;python index.py&quot;</span><br><span class="line"></span><br><span class="line">ENV cgi_headers=&quot;true&quot;</span><br><span class="line">ENV mode=&quot;http&quot;</span><br><span class="line">ENV upstream_url=&quot;http://127.0.0.1:5000&quot;</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;./entrypoint.sh&quot;]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>entrypoint.sh内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#启动tensorflow-serving</span><br><span class="line">/usr/bin/tf_serving_entrypoint.sh &amp; </span><br><span class="line"> </span><br><span class="line">fwatchdog</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>其中/usr/bin/tf_serving_entrypoint.sh脚本是拉取的tensorflow/serving:latest镜像自带的，具体内容为启动tensorflow_model_server监听：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tensorflow_model_server --port=8600 --rest_api_port=8601 --model_name=$&#123;MODEL_NAME&#125; --model_base_path=$&#123;MODEL_BASE_PATH&#125;/$&#123;MODEL_NAME&#125; &quot;$@&quot;</span><br></pre></td></tr></table></figure></p>
+<ol start="4">
+<li><p>requirements.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flask</span><br><span class="line">waitress</span><br><span class="line">tox==3.*</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>template.yml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">language: tfserving #定义language类型，用于创建函数</span><br><span class="line">fprocess: python3 index.py</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>index.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"># Copyright (c) Alex Ellis 2017. All rights reserved.</span><br><span class="line"># Licensed under the MIT license. See LICENSE file in the project root for full license information.</span><br><span class="line"></span><br><span class="line">from flask import Flask, request</span><br><span class="line">from function import handler</span><br><span class="line">from waitress import serve</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"># or set a default timeout</span><br><span class="line">app.config[&apos;TIMEOUT&apos;] = 60</span><br><span class="line"></span><br><span class="line"># distutils.util.strtobool() can throw an exception</span><br><span class="line">def is_true(val):</span><br><span class="line">    return len(val) &gt; 0 and val.lower() == &quot;true&quot; or val == &quot;1&quot;</span><br><span class="line"></span><br><span class="line">@app.before_request</span><br><span class="line">def fix_transfer_encoding():</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Sets the &quot;wsgi.input_terminated&quot; environment flag, thus enabling</span><br><span class="line">    Werkzeug to pass chunked requests as streams.  The gunicorn server</span><br><span class="line">    should set this, but it&apos;s not yet been implemented.</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">    transfer_encoding = request.headers.get(&quot;Transfer-Encoding&quot;, None)</span><br><span class="line">    if transfer_encoding == u&quot;chunked&quot;:</span><br><span class="line">        request.environ[&quot;wsgi.input_terminated&quot;] = True</span><br><span class="line"></span><br><span class="line">@app.route(&quot;/&quot;, defaults=&#123;&quot;path&quot;: &quot;&quot;&#125;, methods=[&quot;POST&quot;, &quot;GET&quot;])</span><br><span class="line">@app.route(&quot;/&lt;path:path&gt;&quot;, methods=[&quot;POST&quot;, &quot;GET&quot;])</span><br><span class="line">def main_route(path):</span><br><span class="line">    raw_body = os.getenv(&quot;RAW_BODY&quot;, &quot;false&quot;)</span><br><span class="line"></span><br><span class="line">    as_text = True</span><br><span class="line"></span><br><span class="line">    if is_true(raw_body):</span><br><span class="line">        as_text = False</span><br><span class="line"></span><br><span class="line">    ret = handler.handle(request.get_data(as_text=as_text))</span><br><span class="line">    return ret</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    serve(app, host=&apos;0.0.0.0&apos;, port=5000)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>function文件夹下的内容与python模板中的function文件夹相同</p>
+</li>
+<li>serving_models文件夹用于存放后续tensorflow_model_server要运行的模型</li>
+</ol>
+<h1 id="根据模板创建函数并调用"><a href="#根据模板创建函数并调用" class="headerlink" title="根据模板创建函数并调用"></a>根据模板创建函数并调用</h1><ol>
+<li><p>创建新函数resnet152</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">faas-cli new --lang tfserving resnet152</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>确保resnet152模型存放在serving_models文件夹中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -r ./serving_models/resnet152 ./template/tfserving/serving_models/</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改resnet152/handler.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">def handle(req):</span><br><span class="line">  \&quot;\&quot;\&quot;handle a request to the function</span><br><span class="line">  Args:</span><br><span class="line">      req (str): request body</span><br><span class="line">  \&quot;\&quot;\&quot;</span><br><span class="line"></span><br><span class="line">  err = \&quot;$func_name: error nont found\&quot;</span><br><span class="line">  a = \&quot;\&quot;</span><br><span class="line">  import os</span><br><span class="line">  import cv2</span><br><span class="line">  import numpy as np</span><br><span class="line">  import  requests</span><br><span class="line">  import json</span><br><span class="line">  url = &apos;http://127.0.0.1:8501/v1/models/$model:predict&apos;</span><br><span class="line">  image = cv2.imread(\&quot;test.png\&quot;)</span><br><span class="line">  image = cv2.resize(image, (1024, 1024))</span><br><span class="line">  image = image.astype(np.uint8) / 255</span><br><span class="line">  image = np.uint8(image)</span><br><span class="line">  image = image.tolist()</span><br><span class="line">  headers = &#123;\&quot;content-type\&quot;: \&quot;application/json\&quot;&#125;</span><br><span class="line">  body = &#123;</span><br><span class="line">          \&quot;signature_name\&quot;: \&quot;serving_default\&quot;,</span><br><span class="line">          \&quot;inputs\&quot;: [</span><br><span class="line">          image</span><br><span class="line">          ]</span><br><span class="line">          &#125;</span><br><span class="line">  beginTime = time.perf_counter()</span><br><span class="line">  r = requests.post(url, data = json.dumps(body), headers = headers)</span><br><span class="line">  endTime = time.perf_counter()</span><br><span class="line">  totalTime = (endTime-beginTime)*1000</span><br><span class="line">  req += \&quot;耗时%f毫秒\&quot;%totalTime+\&quot;\n\&quot;</span><br><span class="line">  print(req)</span><br><span class="line">  return req</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加环境依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;opencv-python</span><br><span class="line">requests&quot; &gt; ./resnet152/requirements.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改yml文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;version: 1.0</span><br><span class="line">provider:</span><br><span class="line">  name: openfaas</span><br><span class="line">  gateway: http://127.0.0.1:31112</span><br><span class="line">functions:</span><br><span class="line">  resnet152:</span><br><span class="line">    lang: resnet152</span><br><span class="line">    handler: ./resnet152</span><br><span class="line">    image: username/resnet152:latest #此处username是Dockerhub用户名</span><br><span class="line">&quot; &gt; ./resnet152.yml</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>build函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">faas-cli build  -f ./resnet152.yml --build-arg MODEL=resnet152</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>push镜像到dockerhub</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#确保docker login过了</span><br><span class="line">sudo docker push username/resnet152:latest</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署函数（这一步会从dockerhub拉取镜像）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">faas-cli deploy -f ./resnet152.yml</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>等待容器成功运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pods -n openfaas-fn</span><br><span class="line"></span><br><span class="line">NAME                            READY   STATUS    RESTARTS   AGE</span><br><span class="line">resnet152-c6b687d55-hlkp2       1/1     Running   0          4h41m</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">faas-cli invoke resnet152 -g 127.0.0.1:31112 &lt; empty_input.txt </span><br><span class="line">#由于input使用的是提前下载好的图片，所以这里采用了empty input，直接执行模型推理</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>函数调用没有成功返回时，可以进入容器排查错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl exec -it resnet152-c6b687d55-hlkp2 -n openfaas-fn /bin/bash</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2023/05/23/deploy-openfaas-functions/">k8s+openfaas运行自定义函数--tfserving prediction</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 清音 的个人博客">清音</a></p>
+  <p><span>发布时间:</span>2023年05月23日 - 14:05</p>
+  <p><span>最后更新:</span>2023年05月23日 - 16:05</p>
+  <p><span>原始链接:</span><a href="/2023/05/23/deploy-openfaas-functions/" title="k8s+openfaas运行自定义函数--tfserving prediction">linqy71.github.io/2023/05/23/deploy-openfaas-functions/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2023/05/23/deploy-openfaas-functions/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	});
+    });  
+</script>
+
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s-openfaas-tf-serving/" rel="tag"><i class="fa fa-tag"></i> k8s openfaas tf-serving</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/03/26/deploy-k8s-with-kubeadm/" rel="next" title="用kubeadm部署k8s并检测GPU">
+                <i class="fa fa-chevron-left"></i> 用kubeadm部署k8s并检测GPU
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#部署k8s"><span class="nav-number">1.</span> <span class="nav-text">部署k8s</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署openfaas"><span class="nav-number">2.</span> <span class="nav-text">部署openfaas</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编写函数模板"><span class="nav-number">3.</span> <span class="nav-text">编写函数模板</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#根据模板创建函数并调用"><span class="nav-number">4.</span> <span class="nav-text">根据模板创建函数并调用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
