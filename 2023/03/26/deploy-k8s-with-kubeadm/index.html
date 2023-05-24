@@ -78,10 +78,10 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="用kubeadm部署k8s并检测GPU">
 <meta property="og:url" content="linqy71.github.io/2023/03/26/deploy-k8s-with-kubeadm/index.html">
-<meta property="og:site_name" content="曲率飞行">
+<meta property="og:site_name" content="山水也清音">
 <meta property="og:description" content="尝试用minikube部署k8s的时候遇到一系列的问题，最终难以实现对GPU的检测,尝试分析问题，但由于minikube采用的是docker in docker的形式，所以较为复杂，改用kubeadm。minikube是单机的k8s集群，kubeadm则支持多机的k8s集群，且与minikube相比少了一层docker，尽管配置起来稍微麻烦一点，但是出了问题比较好排查。   此处应该是最齐全的教">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2023-03-25T18:38:52.883Z">
+<meta property="og:updated_time" content="2023-05-24T06:05:35.006Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用kubeadm部署k8s并检测GPU">
 <meta name="twitter:description" content="尝试用minikube部署k8s的时候遇到一系列的问题，最终难以实现对GPU的检测,尝试分析问题，但由于minikube采用的是docker in docker的形式，所以较为复杂，改用kubeadm。minikube是单机的k8s集群，kubeadm则支持多机的k8s集群，且与minikube相比少了一层docker，尽管配置起来稍微麻烦一点，但是出了问题比较好排查。   此处应该是最齐全的教">
@@ -120,7 +120,7 @@
 
 
 
-  <title>用kubeadm部署k8s并检测GPU | 曲率飞行</title>
+  <title>用kubeadm部署k8s并检测GPU | 山水也清音</title>
   
 
 
@@ -152,7 +152,7 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">曲率飞行</span>
+        <span class="site-title">山水也清音</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -183,16 +183,6 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
-            
-            标签
           </a>
         </li>
       
@@ -268,7 +258,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="曲率飞行">
+      <meta itemprop="name" content="山水也清音">
     </span>
 
     
@@ -311,8 +301,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/操作记录/" itemprop="url" rel="index">
-                    <span itemprop="name">操作记录</span>
+                  <a href="/categories/coding/" itemprop="url" rel="index">
+                    <span itemprop="name">coding</span>
                   </a>
                 </span>
 
@@ -437,7 +427,7 @@
   <p><span>本文标题:</span><a href="/2023/03/26/deploy-k8s-with-kubeadm/">用kubeadm部署k8s并检测GPU</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 清音 的个人博客">清音</a></p>
   <p><span>发布时间:</span>2023年03月26日 - 01:03</p>
-  <p><span>最后更新:</span>2023年03月26日 - 02:03</p>
+  <p><span>最后更新:</span>2023年05月24日 - 14:05</p>
   <p><span>原始链接:</span><a href="/2023/03/26/deploy-k8s-with-kubeadm/" title="用kubeadm部署k8s并检测GPU">linqy71.github.io/2023/03/26/deploy-k8s-with-kubeadm/</a>
     <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2023/03/26/deploy-k8s-with-kubeadm/" aria-label="复制成功！"></i></span>
   </p>
@@ -482,8 +472,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2021/05/06/leveldb源码学习/" rel="next" title="leveldb源码学习">
-                <i class="fa fa-chevron-left"></i> leveldb源码学习
+              <a href="/2021/03/18/rocksdb学习-1/" rel="next" title="rocksdb源码学习">
+                <i class="fa fa-chevron-left"></i> rocksdb源码学习
               </a>
             
           </div>
@@ -575,7 +565,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -586,7 +576,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -597,7 +587,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>

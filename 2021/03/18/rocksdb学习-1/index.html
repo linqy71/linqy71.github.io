@@ -76,14 +76,14 @@
 <meta name="description" content="rocksdb相对于leveldb的改进 性能上：   多线程compaction 多线程memtable写入 减少DB互斥锁持有 优化了基于level的compaction方式以及全局compaction方式 前缀布隆过滤器 memtable布隆过滤器 单个布隆过滤器覆盖整个sstable 写锁优化 提升了Iter::Prev()操作的性能 在进行跳表搜索时调用更少的比较器 使用huge pag">
 <meta name="keywords" content="rocksdb">
 <meta property="og:type" content="article">
-<meta property="og:title" content="rocksdb学习-1">
+<meta property="og:title" content="rocksdb源码学习">
 <meta property="og:url" content="linqy71.github.io/2021/03/18/rocksdb学习-1/index.html">
-<meta property="og:site_name" content="曲率飞行">
+<meta property="og:site_name" content="山水也清音">
 <meta property="og:description" content="rocksdb相对于leveldb的改进 性能上：   多线程compaction 多线程memtable写入 减少DB互斥锁持有 优化了基于level的compaction方式以及全局compaction方式 前缀布隆过滤器 memtable布隆过滤器 单个布隆过滤器覆盖整个sstable 写锁优化 提升了Iter::Prev()操作的性能 在进行跳表搜索时调用更少的比较器 使用huge pag">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2023-03-25T16:54:52.184Z">
+<meta property="og:updated_time" content="2023-05-24T06:06:37.862Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="rocksdb学习-1">
+<meta name="twitter:title" content="rocksdb源码学习">
 <meta name="twitter:description" content="rocksdb相对于leveldb的改进 性能上：   多线程compaction 多线程memtable写入 减少DB互斥锁持有 优化了基于level的compaction方式以及全局compaction方式 前缀布隆过滤器 memtable布隆过滤器 单个布隆过滤器覆盖整个sstable 写锁优化 提升了Iter::Prev()操作的性能 在进行跳表搜索时调用更少的比较器 使用huge pag">
 
 
@@ -120,7 +120,7 @@
 
 
 
-  <title>rocksdb学习-1 | 曲率飞行</title>
+  <title>rocksdb源码学习 | 山水也清音</title>
   
 
 
@@ -152,7 +152,7 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">曲率飞行</span>
+        <span class="site-title">山水也清音</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -183,16 +183,6 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
-            
-            标签
           </a>
         </li>
       
@@ -268,7 +258,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="曲率飞行">
+      <meta itemprop="name" content="山水也清音">
     </span>
 
     
@@ -276,7 +266,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">rocksdb学习-1</h1>
+          <h1 class="post-title" itemprop="name headline">rocksdb源码学习</h1>
         
 
         <div class="post-meta">
@@ -311,8 +301,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/源码分析/" itemprop="url" rel="index">
-                    <span itemprop="name">源码分析</span>
+                  <a href="/categories/源码阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">源码阅读</span>
                   </a>
                 </span>
 
@@ -520,8 +510,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2021/05/06/leveldb源码学习/" rel="prev" title="leveldb源码学习">
-                leveldb源码学习 <i class="fa fa-chevron-right"></i>
+              <a href="/2023/03/26/deploy-k8s-with-kubeadm/" rel="prev" title="用kubeadm部署k8s并检测GPU">
+                用kubeadm部署k8s并检测GPU <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -603,7 +593,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -614,7 +604,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -625,7 +615,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
