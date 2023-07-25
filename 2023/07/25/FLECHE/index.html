@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+
+
+
+
+  <meta name="keywords" content="DLRM, HugeCTR, embedding cache,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、背景 DLRM由 稀疏的嵌入层 和密集的全连接层 组成   由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈 现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。 对NVIDIA Huge">
+<meta name="keywords" content="DLRM, HugeCTR, embedding cache">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EuroSys&#39;22-Fleche：an efficient GPU embedding cache for personalized recommendations">
+<meta property="og:url" content="linqy71.github.io/2023/07/25/FLECHE/index.html">
+<meta property="og:site_name" content="山水也清音">
+<meta property="og:description" content="一、背景 DLRM由 稀疏的嵌入层 和密集的全连接层 组成   由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈 现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。 对NVIDIA Huge">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-07-25T11:26:22.346Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EuroSys&#39;22-Fleche：an efficient GPU embedding cache for personalized recommendations">
+<meta name="twitter:description" content="一、背景 DLRM由 稀疏的嵌入层 和密集的全连接层 组成   由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈 现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。 对NVIDIA Huge">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="linqy71.github.io/2023/07/25/FLECHE/">
+
+
+
+
+
+  <title>EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations | 山水也清音</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+  
+    <a href="https://github.com/linqy71"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">山水也清音</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">料青山见我应如是</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2023/07/25/FLECHE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="清音">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/mai.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="山水也清音">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-07-25T19:02:59+08:00">
+                2023-07-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,852
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h1><ul>
+<li>DLRM由 稀疏的嵌入层 和密集的全连接层 组成  </li>
+<li>由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈</li>
+<li>现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。</li>
+<li>对NVIDIA HugeCTR-inference进行了测试，主要问题来源：<ul>
+<li>缓存利用率不足：static per-table structure带来的缺陷</li>
+<li>内核维护开销：small cache-query内核过多，导致70%的缓存查询时间花费在kernel execution以外的任务上。</li>
+</ul>
+</li>
+</ul>
+<p><strong>针对缓存利用率不足的问题：</strong><br>采用flat cache：与其对每个嵌入表的cache table进行分区，flat cache对所有嵌入表重新编码，使其能够共享一个全局缓存。</p>
+<p><strong>针对内核维护开销过大的问题：</strong><br>由于大多数的内核启动请求是针对同样的function，只是输入的参数不同，因此文章采用了self-identified kernel fusion：将小型内核调用合并为单一调用，并让内核中的每个线程识别它最初应该服务的内核调用。 这种方法大大减少了内核查询数，减轻了内核维护开销，同时保留了多缓存表查询的语义。</p>
+<p><strong>优化缓存查询流程：</strong></p>
+<ol>
+<li><p>将hit embedding与 indexing FC解耦 -&gt; 使得GPU-HBM与CPU DRAM可以高度并行。即：当发生miss时，可以直接从CPU DRAM加载embedding，无需等待 复制hit embedding的完成</p>
+</li>
+<li><p>采用统一索引技术，将CPU-DRAM层的部分索引卸载到GPU -&gt; 进一步减少了cache miss的开销，且能够利用GPU的涡轮增加提升查找性能。</p>
+</li>
+</ol>
+<h1 id="二、DLRM详解"><a href="#二、DLRM详解" class="headerlink" title="二、DLRM详解"></a>二、DLRM详解</h1><p><a href="FLECHE/DLRM.png"></a></p>
+<ul>
+<li><p>类别input(通常是ID list) 是one-hot 或者multi-hot的高维特征</p>
+</li>
+<li><p>嵌入表类似于哈希表，对于每个类别的特征维护一个嵌入表</p>
+</li>
+<li><p>嵌入表查询类似于哈希表查询，其中，key是input ID，value 是d-维 embedding vector</p>
+</li>
+<li><p>嵌入表查询完成之后，将得到的vector通过池化操作压缩成密集向量</p>
+</li>
+<li><p>最后所有池化向量与原始输入的密集向量一起输入MLP</p>
+</li>
+</ul>
+<p><strong>存在的问题：</strong></p>
+<ul>
+<li><p>嵌入层的随机查找会导致大量的 cache miss</p>
+</li>
+<li><p>多个线程同时访问多个嵌入表会耗尽DRAM带宽</p>
+</li>
+</ul>
+<p><strong>直观的解决方案：</strong></p>
+<ul>
+<li>将hot embedding缓存在GPU</li>
+</ul>
+<h1 id="三、现有缓存机制详解"><a href="#三、现有缓存机制详解" class="headerlink" title="三、现有缓存机制详解"></a>三、现有缓存机制详解</h1><p><a href="FLECHE/embedding_cache.png"></a></p>
+<ul>
+<li><p>CPU内存中保存的是embedding full table，GPU内存中保存的是cache table(比full table更小)</p>
+</li>
+<li><p>当查询缓存时，现有的机制会启动一个kernel（每个cache table对应1个kernel），kernel会先将所有cache hit的embedding加载到输出矩阵，然后kernel执行完毕，随后CPU从GPU那获得cache miss 的ID list，查询embedding table，再将所需要的embedding加载到输出矩阵。在这个过程中，n个kernel可以放到n个cudaStream中进行并发。</p>
+</li>
+<li><p>HugeCTR为每个embedding table静态设置了相同size的cache table。然而，由于热度不同，这种静态缓存只能缓存下每个embedding table内部的热点，而无法将全局的embedding 热点很好地缓存。</p>
+</li>
+<li><p>所谓内核维护时间，可以分为：CPU启动、上下文初始化、CPU同步、CPU-GPU通信。缓存表数量越多，启动kernel数越多，内核维护所需时间更长。</p>
+</li>
+</ul>
+<h1 id="四、设计"><a href="#四、设计" class="headerlink" title="四、设计"></a>四、设计</h1><p><a href="FLECHE/fleche.png"></a></p>
+<h2 id="4-1-flat-cache"><a href="#4-1-flat-cache" class="headerlink" title="4.1 flat cache"></a>4.1 flat cache</h2><ol>
+<li><p>cache table 结构</p>
+<ul>
+<li><p>采用KV分离的形式，内存池存储来自不同缓存表的所有value，GPU侧的索引维护从flat key到内存池 location的映射。</p>
+</li>
+<li><p>最小化元数据信息：不存储size相关信息，因为key是id，value是embedding table，通过value也能知道size；存储了时间戳充当版本号，能够进行并发读写控制，不需要额外的元数据。</p>
+</li>
+</ul>
+</li>
+<li><p>flat key格式</p>
+<ul>
+<li><p>所有的cache table实际上公用一个全局cache</p>
+</li>
+<li><p>简单采用固定长度的table id与固定长度feature id拼接的形式，容易产生大量哈希冲突，因为key的数量不同。例如，city的数量很少但是user的数量很多，所以user表会有大量哈希冲突但是city表就很空</p>
+</li>
+<li><p>因此文章采用了size-aware encoding：将较短的id分配给较大的table。根据embedding table的大小，计算出可以容纳所有feature所需的bit之后，剩余的bit全部用来存储table id。</p>
+</li>
+</ul>
+</li>
+<li><p>缓存替换和驱逐</p>
+<ul>
+<li><p>基于概率的过滤策略：每个embedding有1/p的概率会放入cache，因此读取次数大于p的特征一定会放入缓存，这样就能够让缓存尽可能多地保存热数据。</p>
+</li>
+<li><p>缓存驱逐时尽可能驱逐cold embedding。epoch-based space reclamation：声明某个embedding被驱逐时并没有实际从cache中移除，而是等到所有线程都不需要读取这个embedding才真正回收空间。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="4-2-self-identified-kernel-fusion"><a href="#4-2-self-identified-kernel-fusion" class="headerlink" title="4.2 self-identified kernel fusion"></a>4.2 self-identified kernel fusion</h2><ol>
+<li><p>初始化阶段：CPU初始化1个数组用于存放原始n个kernel的参数，并计算一个scan数据，计算前i个kernel的线程数总和，然后启动1个kernel，这个kernel具有原本n个kernel线程数总和的线程。</p>
+</li>
+<li><p>识别阶段：在这个阶段，每个GPU线程需要确定原本n个内核的时候自己对应哪个位置，可以通过scan数组来确定。由于所有的线程共享scan和args数组，所以它们可以缓存在GPU的SM共享内存中，加速重复访问。</p>
+</li>
+<li><p>执行阶段：读取到参数之后就可以像原来那样执行查询了。由此，原来的多kernel启动减少到了单kernel启动。</p>
+</li>
+</ol>
+<h2 id="4-3-优化cache查询流程"><a href="#4-3-优化cache查询流程" class="headerlink" title="4.3 优化cache查询流程"></a>4.3 优化cache查询流程</h2><ol>
+<li><p>将copy和indexing解耦：当有2个wrap同时访问同一个KV对时，wrap1会将该表项上锁，进行index、从GPU全局内存copy，然后解锁，wrap2必须等待此过程。从全局内存copy是耗时的过程，将index与copy解耦之后，只需要启动1个额外的kernel去进行copy，此后1个kernel执行index，另一个kernel执行copy。而copy kenel无需担心线程安全问题，因为有epoch-based space reclamation。</p>
+</li>
+<li><p>绕过DRAM层索引：将DRAM层的索引信息加入统一索引层，在GPU就可以获取到DRAM location信息，GPU的查找速度也比CPU更快，但是这样会占用额外的GPU内存空间，本来可以用于缓存embedding，因此这两者之间需要权衡。</p>
+</li>
+</ol>
+<h1 id="五、实现"><a href="#五、实现" class="headerlink" title="五、实现"></a>五、实现</h1><p>采用cudaMemcpy是很慢的，大概6-7 us。使用GDRCopy库，可以把HBM暴露给CPU，基于GPUDirect RDMA技术使用CPU驱动的拷贝方式，将small copy加速到0.1us</p>
+<h1 id="六、不足"><a href="#六、不足" class="headerlink" title="六、不足"></a>六、不足</h1><ol>
+<li><p>只考虑单机情况，多机情况下DRAM也只是一个缓存层，因此指向DRAM的指针可能会失效</p>
+</li>
+<li><p>只考虑了单GPU情况。多GPU情况下缓存空间会更大，且模型并行消除了GPU之间的冗余。</p>
+</li>
+</ol>
+<p>注意：persistent kernel虽然可以通过轮询减少内核维护开销，但持久地占用了SM资源会导致后续的MLP层性能大幅降低。</p>
+<p>注意：NLP和GNN中也有embedding table。NLP的嵌入表比较小，可以完全缓存在GPU中。GNN的嵌入表则与DLRM类似。</p>
+<p>baseline ： HugeCTR from NVIDIA</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    <div>
+      
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/2023/07/25/FLECHE/">EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 清音 的个人博客">清音</a></p>
+  <p><span>发布时间:</span>2023年07月25日 - 19:07</p>
+  <p><span>最后更新:</span>2023年07月25日 - 19:07</p>
+  <p><span>原始链接:</span><a href="/2023/07/25/FLECHE/" title="EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations">linqy71.github.io/2023/07/25/FLECHE/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2023/07/25/FLECHE/" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
+</div>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+	  $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({   
+          title: "",   
+          text: '复制成功',
+          icon: "success", 
+          showConfirmButton: true
+          });
+	});
+    });  
+</script>
+
+      
+    </div>
+
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DLRM-HugeCTR-embedding-cache/" rel="tag"><i class="fa fa-tag"></i> DLRM, HugeCTR, embedding cache</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/05/24/且介亭杂文/" rel="next" title="读《且介亭杂文》">
+                <i class="fa fa-chevron-left"></i> 读《且介亭杂文》
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/mai.jpg" alt="清音">
+            
+              <p class="site-author-name" itemprop="name">清音</p>
+              <p class="site-description motion-element" itemprop="description">“吾生也有涯，而知也无涯”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/linqy71" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:275769386@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="86" src="//music.163.com/outchain/player?type=2&id=1060910&auto=1&height=66"></iframe>
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://wu-kan.cn" title="吴博" target="_blank">吴博</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、背景"><span class="nav-number">1.</span> <span class="nav-text">一、背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、DLRM详解"><span class="nav-number">2.</span> <span class="nav-text">二、DLRM详解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、现有缓存机制详解"><span class="nav-number">3.</span> <span class="nav-text">三、现有缓存机制详解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、设计"><span class="nav-number">4.</span> <span class="nav-text">四、设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-flat-cache"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 flat cache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-self-identified-kernel-fusion"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 self-identified kernel fusion</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-优化cache查询流程"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 优化cache查询流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五、实现"><span class="nav-number">5.</span> <span class="nav-text">五、实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#六、不足"><span class="nav-number">6.</span> <span class="nav-text">六、不足</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">清音</span>
+
+  
+</div>
+
+
+  <div class="powered-by">
+    <i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+    本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+  </div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+</html>
