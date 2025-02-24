@@ -77,20 +77,20 @@
 <meta name="keywords" content="Redis, centos">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis环境配置">
-<meta property="og:url" content="linqy71.github.io/2020/10/04/Redis环境配置/index.html">
+<meta property="og:url" content="https://linqy71.github.io/2020/10/04/Redis环境配置/index.html">
 <meta property="og:site_name" content="Qingyin Lin">
 <meta property="og:description" content="Redis环境配置记录 记录在centos上安装redis的过程   下载Redis软件包wget http://download.redis.io/releases/redis-6.0.0.tar.gz选择最新版redis压缩包进行下载  解压并安装tar xvf redis-6.0.0.tar.gzcd redis-6.0.0makesudo make install PREFIX=/usr/">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="/2020/10/04/Redis环境配置/ps-result.png">
-<meta property="og:image" content="/2020/10/04/Redis环境配置/cluster-nodes.png">
-<meta property="og:image" content="/2020/10/04/Redis环境配置/test-set.jpg">
-<meta property="og:image" content="/2020/10/04/Redis环境配置/test-benchmark.png">
-<meta property="og:image" content="/2020/10/04/Redis环境配置/gem-redisstat-error.png">
-<meta property="og:updated_time" content="2023-05-24T06:06:25.051Z">
+<meta property="og:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/ps-result.png">
+<meta property="og:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/cluster-nodes.png">
+<meta property="og:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/test-set.jpg">
+<meta property="og:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/test-benchmark.png">
+<meta property="og:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/gem-redisstat-error.png">
+<meta property="og:updated_time" content="2025-02-24T12:08:16.423Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis环境配置">
 <meta name="twitter:description" content="Redis环境配置记录 记录在centos上安装redis的过程   下载Redis软件包wget http://download.redis.io/releases/redis-6.0.0.tar.gz选择最新版redis压缩包进行下载  解压并安装tar xvf redis-6.0.0.tar.gzcd redis-6.0.0makesudo make install PREFIX=/usr/">
-<meta name="twitter:image" content="/2020/10/04/Redis环境配置/ps-result.png">
+<meta name="twitter:image" content="https://linqy71.github.io/2020/10/04/Redis环境配置/ps-result.png">
 
 
 
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="linqy71.github.io/2020/10/04/Redis环境配置/">
+  <link rel="canonical" href="https://linqy71.github.io/2020/10/04/Redis环境配置/">
 
 
 
@@ -234,7 +234,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2020/10/04/Redis环境配置/">
+    <link itemprop="mainEntityOfPage" href="https://linqy71.github.io/2020/10/04/Redis环境配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="林清音">
@@ -369,7 +369,7 @@
 <li><p>启动redis集群<br>为多个server修改配置文件以配置不同的端口、开启集群模式等，<br>然后运行多个server，每个server启动命令如下：<br><code>redis-server ./redis-6.0.0/conf/redis-6379.conf</code></p>
 </li>
 <li><p>后台查看server运行状态<br><code>ps -fu username</code> 可以查看用户名下运行的所有进程</p>
-<p><img src="/2020/10/04/Redis环境配置/ps-result.png" alt></p>
+<p><img src="//linqy71.github.io/2020/10/04/Redis环境配置/ps-result.png" alt></p>
 </li>
 <li><p>启动后客户端连接服务器<br><code>redis-cli -h xxx -p xxx</code><br><code>-h</code> 接server所在的主机ip， <code>-p</code>接server运行端口</p>
 </li>
@@ -405,14 +405,14 @@
 <li>在主机1上启动6个server节点</li>
 <li>在主机2上连接其中一个节点并进行节点握手：<br><code>redis-cli -c -h xxxx(host ip) -p 6379</code><br><code>6379&gt; cluster meet xxxx 6380/6381/6382/6383/6384</code><br><code>6379&gt; quit</code></li>
 <li>在主机2上为6个server分配16384个slots：<br><code>&gt; redis-cli -h xxxx -p 6379 cluster addslots {0..2729}</code><br>其余5个server节点类似。</li>
-<li>查看集群：<br><code>6379&gt; cluster nodes</code><br><img src="/2020/10/04/Redis环境配置/cluster-nodes.png" alt></li>
-<li>测试集群：<br><code>6379&gt; set university &quot;SYSU&quot;</code><br><img src="/2020/10/04/Redis环境配置/test-set.jpg" alt></li>
-<li>使用benchmark测试集群：<br><img src="/2020/10/04/Redis环境配置/test-benchmark.png" alt></li>
+<li>查看集群：<br><code>6379&gt; cluster nodes</code><br><img src="//linqy71.github.io/2020/10/04/Redis环境配置/cluster-nodes.png" alt></li>
+<li>测试集群：<br><code>6379&gt; set university &quot;SYSU&quot;</code><br><img src="//linqy71.github.io/2020/10/04/Redis环境配置/test-set.jpg" alt></li>
+<li>使用benchmark测试集群：<br><img src="//linqy71.github.io/2020/10/04/Redis环境配置/test-benchmark.png" alt></li>
 </ol>
 <p><strong>集群启动方法二：</strong></p>
 <p><code>redis-cli --cluster create host1:port1 host2:port2 ...</code></p>
 <h2 id="监控集群"><a href="#监控集群" class="headerlink" title="监控集群"></a>监控集群</h2><ol>
-<li>安装redis-stat<br>采用 <code>gem install redis-stat</code> 报错：<br><img src="/2020/10/04/Redis环境配置/gem-redisstat-error.png" alt><br>于是下载<a href="https://github.com/junegunn/redis-stat/releases" target="_blank" rel="noopener">github</a>上的jar包后，<br>通过<code>java -jar redis-stat-0.4.14.jar --server</code>直接启动redis-stat</li>
+<li>安装redis-stat<br>采用 <code>gem install redis-stat</code> 报错：<br><img src="//linqy71.github.io/2020/10/04/Redis环境配置/gem-redisstat-error.png" alt><br>于是下载<a href="https://github.com/junegunn/redis-stat/releases" target="_blank" rel="noopener">github</a>上的jar包后，<br>通过<code>java -jar redis-stat-0.4.14.jar --server</code>直接启动redis-stat</li>
 </ol>
 <p>redis-stat 参考 <a href="https://github.com/junegunn/redis-stat" target="_blank" rel="noopener">https://github.com/junegunn/redis-stat</a></p>
 <hr>

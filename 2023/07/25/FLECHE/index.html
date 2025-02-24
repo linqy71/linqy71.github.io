@@ -77,18 +77,18 @@
 <meta name="keywords" content="DLRM, HugeCTR, embedding cache">
 <meta property="og:type" content="article">
 <meta property="og:title" content="EuroSys&#39;22-Fleche：an efficient GPU embedding cache for personalized recommendations">
-<meta property="og:url" content="linqy71.github.io/2023/07/25/FLECHE/index.html">
+<meta property="og:url" content="https://linqy71.github.io/2023/07/25/FLECHE/index.html">
 <meta property="og:site_name" content="Qingyin Lin">
 <meta property="og:description" content="一、背景 DLRM由 稀疏的嵌入层 和密集的全连接层 组成   由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈 现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。 对NVIDIA Huge">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="/2023/07/25/FLECHE/DLRM.png">
-<meta property="og:image" content="/2023/07/25/FLECHE/embedding_cache.png">
-<meta property="og:image" content="/2023/07/25/FLECHE/fleche.png">
-<meta property="og:updated_time" content="2023-07-25T11:30:11.357Z">
+<meta property="og:image" content="https://linqy71.github.io/2023/07/25/FLECHE/DLRM.png">
+<meta property="og:image" content="https://linqy71.github.io/2023/07/25/FLECHE/embedding_cache.png">
+<meta property="og:image" content="https://linqy71.github.io/2023/07/25/FLECHE/fleche.png">
+<meta property="og:updated_time" content="2025-02-24T12:08:16.407Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EuroSys&#39;22-Fleche：an efficient GPU embedding cache for personalized recommendations">
 <meta name="twitter:description" content="一、背景 DLRM由 稀疏的嵌入层 和密集的全连接层 组成   由嵌入表的不规则访问和稀疏访问导致的CPU端的DRAM带宽稀缺已经成为DLRM的主要性能瓶颈 现有缓存方案（static per-table cache structure）没有很好地利用GPU端cache。该缓存方案为每个嵌入表维护一个固定大小的cache table，以防止表重新分区期间发生大量数据移动。 对NVIDIA Huge">
-<meta name="twitter:image" content="/2023/07/25/FLECHE/DLRM.png">
+<meta name="twitter:image" content="https://linqy71.github.io/2023/07/25/FLECHE/DLRM.png">
 
 
 
@@ -118,7 +118,7 @@
 
 
 
-  <link rel="canonical" href="linqy71.github.io/2023/07/25/FLECHE/">
+  <link rel="canonical" href="https://linqy71.github.io/2023/07/25/FLECHE/">
 
 
 
@@ -232,7 +232,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="linqy71.github.io/2023/07/25/FLECHE/">
+    <link itemprop="mainEntityOfPage" href="https://linqy71.github.io/2023/07/25/FLECHE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="林清音">
@@ -371,7 +371,7 @@
 <li><p>采用统一索引技术，将CPU-DRAM层的部分索引卸载到GPU -&gt; 进一步减少了cache miss的开销，且能够利用GPU的涡轮增加提升查找性能。</p>
 </li>
 </ol>
-<h1 id="二、DLRM详解"><a href="#二、DLRM详解" class="headerlink" title="二、DLRM详解"></a>二、DLRM详解</h1><p><img src="/2023/07/25/FLECHE/DLRM.png" alt></p>
+<h1 id="二、DLRM详解"><a href="#二、DLRM详解" class="headerlink" title="二、DLRM详解"></a>二、DLRM详解</h1><p><img src="//linqy71.github.io/2023/07/25/FLECHE/DLRM.png" alt></p>
 <ul>
 <li><p>类别input(通常是ID list) 是one-hot 或者multi-hot的高维特征</p>
 </li>
@@ -395,7 +395,7 @@
 <ul>
 <li>将hot embedding缓存在GPU</li>
 </ul>
-<h1 id="三、现有缓存机制详解"><a href="#三、现有缓存机制详解" class="headerlink" title="三、现有缓存机制详解"></a>三、现有缓存机制详解</h1><p><img src="/2023/07/25/FLECHE/embedding_cache.png" alt></p>
+<h1 id="三、现有缓存机制详解"><a href="#三、现有缓存机制详解" class="headerlink" title="三、现有缓存机制详解"></a>三、现有缓存机制详解</h1><p><img src="//linqy71.github.io/2023/07/25/FLECHE/embedding_cache.png" alt></p>
 <ul>
 <li><p>CPU内存中保存的是embedding full table，GPU内存中保存的是cache table(比full table更小)</p>
 </li>
@@ -406,7 +406,7 @@
 <li><p>所谓内核维护时间，可以分为：CPU启动、上下文初始化、CPU同步、CPU-GPU通信。缓存表数量越多，启动kernel数越多，内核维护所需时间更长。</p>
 </li>
 </ul>
-<h1 id="四、设计"><a href="#四、设计" class="headerlink" title="四、设计"></a>四、设计</h1><p><img src="/2023/07/25/FLECHE/fleche.png" alt></p>
+<h1 id="四、设计"><a href="#四、设计" class="headerlink" title="四、设计"></a>四、设计</h1><p><img src="//linqy71.github.io/2023/07/25/FLECHE/fleche.png" alt></p>
 <h2 id="4-1-flat-cache"><a href="#4-1-flat-cache" class="headerlink" title="4.1 flat cache"></a>4.1 flat cache</h2><ol>
 <li><p>cache table 结构</p>
 <ul>
@@ -480,9 +480,9 @@
   <p><span>本文标题:</span><a href="/2023/07/25/FLECHE/">EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations</a></p>
   <p><span>文章作者:</span><a href="/" title="访问 林清音 的个人博客">林清音</a></p>
   <p><span>发布时间:</span>2023年07月25日 - 19:07</p>
-  <p><span>最后更新:</span>2023年07月25日 - 19:07</p>
-  <p><span>原始链接:</span><a href="/2023/07/25/FLECHE/" title="EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations">linqy71.github.io/2023/07/25/FLECHE/</a>
-    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="linqy71.github.io/2023/07/25/FLECHE/" aria-label="复制成功！"></i></span>
+  <p><span>最后更新:</span>2025年02月24日 - 20:02</p>
+  <p><span>原始链接:</span><a href="/2023/07/25/FLECHE/" title="EuroSys'22-Fleche：an efficient GPU embedding cache for personalized recommendations">https://linqy71.github.io/2023/07/25/FLECHE/</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://linqy71.github.io/2023/07/25/FLECHE/" aria-label="复制成功！"></i></span>
   </p>
   <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>  
 </div>
