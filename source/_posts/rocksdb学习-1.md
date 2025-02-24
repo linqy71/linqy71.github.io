@@ -1,8 +1,8 @@
 ---
-title: rocksdb学习-1
+title: rocksdb源码学习
 date: 2021-03-18 10:48:58
 tags: rocksdb
-categories: 源码分析
+categories: 源码阅读
 copyright:
 ---
 

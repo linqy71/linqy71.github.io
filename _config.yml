@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 曲率飞行
+title: 山水也清音
 subtitle: 料青山见我应如是
 description: “吾生也有涯，而知也无涯”
 author: 清音
@@ -21,7 +21,7 @@ permalink_defaults:
 # Directory
 source_dir: source
 public_dir: public
-tag_dir: tags
+# tag_dir: tags
 archive_dir: archives
 category_dir: categories
 code_dir: downloads/code

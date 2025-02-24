@@ -2,7 +2,7 @@
 title: 用kubeadm部署k8s并检测GPU
 date: 2023-03-26 01:30:14
 tags: k8s kubernetes kubeadm gpu
-categories: 操作记录
+categories: coding
 copyright: true
 ---
 

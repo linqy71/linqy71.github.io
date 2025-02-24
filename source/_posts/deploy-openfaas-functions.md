@@ -2,7 +2,7 @@
 title: k8s+openfaas运行自定义函数--tfserving prediction
 date: 2023-05-23 14:59:12
 tags: k8s openfaas tf-serving
-categories: 操作记录
+categories: coding
 copyright: true
 ---
 

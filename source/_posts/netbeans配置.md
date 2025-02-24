@@ -2,7 +2,7 @@
 title: netbeans配置
 date: 2021-01-26 13:31:52
 tags: netbeans
-categories: 操作记录
+categories: coding
 copyright:
 ---
 

@@ -2,7 +2,7 @@
 title: Mylist
 date: 2018-03-29 11:26:23
 tags: UWP C# win10
-categories: 开发记录
+categories: 课程作业
 copyright: true
 ---
 

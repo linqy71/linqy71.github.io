@@ -2,7 +2,7 @@
 title: 系分项目-个人小结
 date: 2019-06-29 14:30:37
 tags: 系统分析与设计
-categories: 系统分析与设计
+categories: 课程作业
 copyright: true
 ---
 

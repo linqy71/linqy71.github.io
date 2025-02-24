@@ -2,7 +2,7 @@
 title: MoneyDodo-项目管理总结
 date: 2019-06-29 15:57:10
 tags: 项目管理
-categories: 系统分析与设计
+categories: 课程作业
 copyright: true
 ---
 

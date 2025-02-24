@@ -2,7 +2,7 @@
 title: 微信小程序--入门与踩坑
 date: 2019-06-29 19:12:04
 tags: 微信小程序
-categories: 系统分析与设计
+categories: coding
 copyright: true
 ---
 
