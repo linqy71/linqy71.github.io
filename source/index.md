@@ -25,11 +25,12 @@ linqy35@mail2.sysu.edu.cn
 ## 成果 Publications
 
 - **[VLDB 2025]** **Qingyin Lin**, Jiangsu Du，Rui Li, Zhiguang Chen, Wenguang Chen, and Nong Xiao, “IncrCP: Decomposing and Orchestrating Incremental Checkpoints for Effective Recommendation Model Training”.
-
+- **[大数据 2023]** [**林清音**, 陈志广, "基于更新热点感知的 LSM-Tree 查询优化"](https://www.infocomm-journal.com/bdr/article/2023/2096-0271/2096-0271-9-1-00126.shtml)
+- **[Electronics Letters 2020]** [Lingyu Zhu, **Qingyin Lin**, Fang Liu, "Energy analysis for internet of things software: A simulator approach"](https://ietresearch.onlinelibrary.wiley.com/doi/abs/10.1049/el.2020.0656)
 
 ## 兴趣爱好 Interests and Hobbies
 
-羽毛球 Badminton ; 书法 calligraphy ; 滑雪 Snowboarding ; 音乐 Music ; 文学 Chinese Literature
+羽毛球 Badminton ; 书法 Calligraphy ; 滑雪 Snowboarding ; 音乐 Music ; 文学 Chinese Literature
 
 ## 博客记录 Posts
 [分类 Categories](categories/)
